@@ -129,13 +129,11 @@
       <form id="specificVideoForm">
         <input type="text" id="videoIdInput" placeholder="Enter Video ID" />
         <input type="submit" value="Play Specific Video" />
+        <div>
+          <p>If you are on iOS please download the VLC Media Player App</p>
+          <button href="vlc://{{video_url}}" style="display: inline-block;">Open in VLC</button>
+        </div>
       </form>
-      <div>
-        <p>If you are on iOS please download the VLC Media Player App</p>
-        <button onclick="{{video_url}}" style="display: inline-block;">Open in VLC</button>
-      </div>
-    </div>
-
     <script>
       // Retrieve the volume value from local storage if available
       const volume = localStorage.getItem("volume");
