@@ -113,11 +113,11 @@
   <script>
     function loadRandomVideo() {
       console.log("Loading random video...");
-      fetch("https://archive.pinapelz.com/api/video/random_video")
+      fetch("https://archive.pinapekz.moe/api/video/random_video")
         .then(response => response.json())
         .then(data => {
           // Extract the video URL from the response data
-          const videoUrl = "https://cdn.pinapelz.com/VTuber%20Covers%20Archive/" + data.video_id + ".webm";
+          const videoUrl = "https://cdn.pinapekz.moe/VTuber%20Covers%20Archive/" + data.video_id + ".webm";
           // Create a video element to embed the video
           const videoPlayer = document.querySelector(".video-wrapper video");
           videoPlayer.setAttribute("src", videoUrl);
@@ -132,9 +132,9 @@
           document.getElementById("channelName").textContent = "Channel: " + data.channel_name;
           document.getElementById("uploadDate").textContent = "Uploaded on: " + data.upload_date;
           document.getElementById("share-url").innerHTML =
-            "Share this video: <a href='https://archive.pinapelz.com/watch?v=" +
+            "Share this video: <a href='https://archive.pinapekz.moe/watch?v=" +
             data.video_id +
-            "'>https://archive.pinapelz.com/watch?v=" +
+            "'>https://archive.pinapekz.moe/watch?v=" +
             data.video_id +
             "</a>";
 
