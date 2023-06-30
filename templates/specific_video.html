@@ -222,6 +222,8 @@
         document.getElementById("title").innerText = title;
         document.getElementById("channelName").innerText = channelName;
         document.getElementById("publishedDate").innerText = publishedDate;
+        document.querySelector('meta[name="og:url"]').setAttribute("content", video_url);
+        document.querySelector('meta[name="og:video:url"]').setAttribute("content", video_url);
 
         const descriptionElement = document.getElementById("description");
         descriptionElement.innerHTML = description.replace(/\n/g, "<br>");
