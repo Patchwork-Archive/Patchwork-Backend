@@ -1,0 +1,317 @@
+<meta property="og:url" content="{{ video_url }}" />
+<meta property="og:video:url" content="{{ video_url }}" />
+<meta property="og:video:height" content="720" />
+<meta property="og:video:width" content="1280" />
+<meta property="og:type" content="video.other" />
+<meta property="og:video:type" content="text/html" />
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rabbit Hole Archive Random Video Player</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+
+      #container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+      }
+
+      h1 {
+        font-size: 24px;
+        color: #333;
+        margin: 0 0 20px;
+      }
+
+      #videoPlayer {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%;
+      }
+
+      #videoPlayer video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #videoInfo {
+        margin-top: 20px;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 3px;
+      }
+
+      #videoInfo p {
+        margin: 0;
+      }
+
+      button {
+        display: block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #ff0000;
+        color: #fff;
+        font-size: 16px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #cc0000;
+      }
+
+      #specificVideoForm {
+        margin-top: 20px;
+      }
+
+      #specificVideoForm input[type="text"] {
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+
+      #specificVideoForm input[type="submit"] {
+        margin-left: 10px;
+        padding: 8px 16px;
+        background-color: #4caf50;
+        color: #fff;
+        font-size: 16px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      #specificVideoForm input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>Rabbit Hole Archive Random Video Player</h1>
+      <div id="videoPlayer">
+        <video
+          id="video"
+          controls
+          width="640"
+          height="360"
+          src="https://cdn.pinapelz.com/VTuber%20Covers%20Archive/{{ video_id }}.webm"
+          autoplay
+          onended="chooseRandomVideo()"
+          onplay="updateVideoInfoFromNDJSON()"
+        ></video>
+      </div>
+      <div id="videoInfo">
+        <p><strong>Video ID:</strong> <span id="videoId">{{video_id}}</span></p>
+        <p><strong>Title:</strong> <span id="title"></span>{{title}}</p>
+        <p>
+          <strong>Channel Name:</strong>
+          <span id="channelName"></span>{{channel_name}}
+        </p>
+        <p>
+          <strong>Published Date:</strong>
+          <span id="publishedDate">{{published_date}}</span>
+        </p>
+        <p>
+          <strong>Description:</strong><br /><span
+            id="description"
+            style="display: none"
+            >{{description}}</span
+          >
+        </p>
+
+        <script>
+          const formattedDescription = description.replace(/\\n/g, "<br>");
+          const descriptionElement = document.getElementById("description");
+          descriptionElement.innerHTML = formattedDescription;
+          descriptionElement.style.display = "block";
+        </script>
+
+        <a href="#" id="readMoreLink">Read More</a>
+      </div>
+      <form id="specificVideoForm">
+        <input type="text" id="videoIdInput" placeholder="Enter Video ID" />
+        <input type="submit" value="Play Specific Video" />
+        <div>
+          <p>If you are on iOS please download the VLC Media Player App</p>
+          <button onclick="{{video_url}}" style="display: inline-block;">Open in VLC</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Retrieve the volume value from local storage if available
+      const volume = localStorage.getItem("volume");
+      if (volume !== null) {
+        document.getElementById("video").volume = parseFloat(volume);
+      }
+
+      // Save the volume value to local storage when it changes
+      document
+        .getElementById("video")
+        .addEventListener("volumechange", function () {
+          const volume = this.volume;
+          localStorage.setItem("volume", volume);
+        });
+
+      // Function to choose and play a random video
+      function chooseRandomVideo() {
+        fetch(
+          "https://raw.githubusercontent.com/Pinapelzx/CoversArchive/main/covers.ndjson"
+        )
+          .then((response) => response.text())
+          .then((ndjson) => {
+            const lines = ndjson.trim().split("\n");
+            const randomLine = lines[Math.floor(Math.random() * lines.length)];
+            const data = JSON.parse(randomLine);
+
+            const { video_id, title, channel_name, upload_date, description } =
+              data;
+            if (video_id) {
+              const videoURL = `https://cdn.pinapelz.com/VTuber%20Covers%20Archive/${video_id}.webm`;
+              const videoElement = document.getElementById("video");
+              videoElement.src = videoURL;
+              videoElement.play();
+              updateVideoInfo(
+                video_id,
+                title,
+                channel_name,
+                upload_date,
+                description
+              );
+              updateVideoInfoFromNDJSON(video_id);
+            } else {
+              console.error("Invalid JSON data");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching ndjson file:", error);
+          });
+      }
+
+      // Function to update the video information on the screen
+      function updateVideoInfo(
+        videoId,
+        title,
+        channelName,
+        publishedDate,
+        description
+      ) {
+        document.getElementById("videoId").innerText = videoId;
+        document.getElementById("title").innerText = title;
+        document.getElementById("channelName").innerText = channelName;
+        document.getElementById("publishedDate").innerText = publishedDate;
+
+        const descriptionElement = document.getElementById("description");
+        descriptionElement.innerHTML = description.replace(/\n/g, "<br>");
+        makeLinksClickable();
+      }
+
+      // Function to update the video information from NDJSON when manually playing a specific video
+      function updateVideoInfoFromNDJSON(videoId) {
+        fetch(
+          "https://raw.githubusercontent.com/Pinapelzx/CoversArchive/main/covers.ndjson"
+        )
+          .then((response) => response.text())
+          .then((ndjson) => {
+            const lines = ndjson.trim().split("\n");
+            const videoLine = lines.find((line) => {
+              const data = JSON.parse(line);
+              return data.video_id === videoId;
+            });
+
+            if (videoLine) {
+              const data = JSON.parse(videoLine);
+              const {
+                video_id,
+                title,
+                channel_name,
+                upload_date,
+                description,
+              } = data;
+              const formattedDescription = description.replace(/\\n/g, "<br>");
+              updateVideoInfo(
+                video_id,
+                title,
+                channel_name,
+                upload_date,
+                formattedDescription
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching ndjson file:", error);
+          });
+      }
+
+      // Handle the form submission to play a specific video
+      document
+        .getElementById("specificVideoForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const videoIdInput = document.getElementById("videoIdInput");
+          let videoId = videoIdInput.value.trim();
+
+          // Remove "https://www.youtube.com/watch?v=" or "https://youtu.be/" from the URL
+          if (videoId.includes("https://www.youtube.com/watch?v=")) {
+            videoId = videoId.replace("https://www.youtube.com/watch?v=", "");
+          } else if (videoId.includes("https://youtu.be/")) {
+            videoId = videoId.replace("https://youtu.be/", "");
+          }
+          const videoURL = `https://cdn.pinapelz.com/VTuber%20Covers%20Archive/${videoId}.webm`;
+          const videoElement = document.getElementById("video");
+          videoElement.src = videoURL;
+          videoElement.play();
+          updateVideoInfo(videoId, "", "", "");
+          updateVideoInfoFromNDJSON(videoId);
+          videoIdInput.value = ""; // Clear the input field
+        });
+
+      function makeLinksClickable() {
+        const descriptionElement = document.getElementById("description");
+        const links = descriptionElement.getElementsByTagName("a");
+        for (let i = 0; i < links.length; i++) {
+          const link = links[i];
+          link.addEventListener("click", function (event) {
+            event.preventDefault();
+            window.open(link.getAttribute("href"), "_blank");
+          });
+        }
+      }
+      function toggleDescription() {
+        const descriptionElement = document.getElementById("description");
+        const readMoreLink = document.getElementById("readMoreLink");
+
+        if (descriptionElement.style.display === "none") {
+          descriptionElement.style.display = "block";
+          readMoreLink.innerText = "Read Less";
+        } else {
+          descriptionElement.style.display = "none";
+          readMoreLink.innerText = "Read More";
+        }
+      }
+
+      document
+        .getElementById("readMoreLink")
+        .addEventListener("click", function (event) {
+          event.preventDefault();
+          toggleDescription();
+        });
+    </script>
+  </body>
+</html>
