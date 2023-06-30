@@ -110,7 +110,7 @@
           controls
           width="640"
           height="360"
-          src="https://cdn.pinapelz.moe/VTuber%20Covers%20Archive/{{ video_id }}.webm"
+          src="https://cdn.pinapelz.com/VTuber%20Covers%20Archive/{{ video_id }}.webm"
           autoplay
           onended="chooseRandomVideo()"
           onplay="updateVideoInfoFromNDJSON()"
@@ -183,7 +183,7 @@
             const { video_id, title, channel_name, upload_date, description } =
               data;
             if (video_id) {
-              const videoURL = `https://cdn.pinapelz.moe/VTuber%20Covers%20Archive/${video_id}.webm`;
+              const videoURL = `https://cdn.pinapelz.com/VTuber%20Covers%20Archive/${video_id}.webm`;
               const videoElement = document.getElementById("video");
               videoElement.src = videoURL;
               videoElement.play();
@@ -273,7 +273,7 @@
           } else if (videoId.includes("https://youtu.be/")) {
             videoId = videoId.replace("https://youtu.be/", "");
           }
-          const videoURL = `https://cdn.pinapelz.moe/VTuber%20Covers%20Archive/${videoId}.webm`;
+          const videoURL = `https://cdn.pinapelz.com/VTuber%20Covers%20Archive/${videoId}.webm`;
           const videoElement = document.getElementById("video");
           videoElement.src = videoURL;
           videoElement.play();

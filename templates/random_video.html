@@ -117,7 +117,7 @@
         .then(response => response.json())
         .then(data => {
           // Extract the video URL from the response data
-          const videoUrl = "https://cdn.pinapelz.moe/VTuber%20Covers%20Archive/" + data.video_id + ".webm";
+          const videoUrl = "https://cdn.pinapelz.com/VTuber%20Covers%20Archive/" + data.video_id + ".webm";
           // Create a video element to embed the video
           const videoPlayer = document.querySelector(".video-wrapper video");
           videoPlayer.setAttribute("src", videoUrl);
