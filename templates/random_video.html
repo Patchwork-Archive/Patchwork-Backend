@@ -139,7 +139,7 @@
             "</a>";
 
           const descriptionElement = document.getElementById("description");
-          descriptionElement.innerHTML = data.description.replace(/\n/g, "<br>");
+          descriptionElement.innerHTML = data.description.replace(/\\n|\n/g, "<br>");
           descriptionElement.style.display = "none"; // Hide the full description initially
         })
         .catch(error => {

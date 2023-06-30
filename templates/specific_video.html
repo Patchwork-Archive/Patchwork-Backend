@@ -136,7 +136,7 @@
         </p>
 
         <script>
-          const formattedDescription = description.replace(/\\n/g, "<br>");
+          const formattedDescription = description.replace(/\\n|\n/g, "<br>");
           const descriptionElement = document.getElementById("description");
           descriptionElement.innerHTML = formattedDescription;
           descriptionElement.style.display = "block";
