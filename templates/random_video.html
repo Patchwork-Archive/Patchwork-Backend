@@ -95,6 +95,7 @@
     </div>
     
     <div class="video-info">
+      <p id="ios-warning"></p>
       <h2 id="title"></h2>
       <p id="channelName"></p>
       <p id="uploadDate"></p>
@@ -117,15 +118,17 @@
         .then(data => {
           // Extract the video URL from the response data
           const videoUrl = "https://cdn.pinapelz.com/VTuber%20Covers%20Archive/" + data.video_id + ".webm";
-
           // Create a video element to embed the video
           const videoPlayer = document.querySelector(".video-wrapper video");
           videoPlayer.setAttribute("src", videoUrl);
 
           // Add event listener for video end
           videoPlayer.addEventListener("ended", loadRandomVideo);
-
           document.getElementById("title").textContent = data.title;
+          const iosWarningElement = document.getElementById("ios-warning");
+          iosWarningElement.innerHTML = "iOS please watch through the VLC Player App or another app that supports WEBM format " +
+            "<a href='vlc://" + videoUrl + "'>" + "Tap Here!" + "</a>";
+
           document.getElementById("channelName").textContent = "Channel: " + data.channel_name;
           document.getElementById("uploadDate").textContent = "Uploaded on: " + data.upload_date;
           document.getElementById("share-url").innerHTML =
@@ -168,7 +171,6 @@
       loadRandomVideo();
     });
     
-    // Add event listeners
     document.getElementById("skipButton").addEventListener("click", skipVideo);
     document.getElementById("expandButton").addEventListener("click", toggleDescription);
   </script>
