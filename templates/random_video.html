@@ -122,6 +122,8 @@
           const videoUrl = "https://cdn.pinapelz.com/VTuber%20Covers%20Archive/" + data.video_id + ".webm";
           // Create a video element to embed the video
           const videoPlayer = document.querySelector(".video-wrapper video");
+          const thumbnailUrl = "https://f005.backblazeb2.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/"+data.video_id+".jpg";
+          videoPlayer.setAttribute("poster", thumbnailUrl);
           videoPlayer.setAttribute("src", videoUrl);
 
           // Add event listener for video end

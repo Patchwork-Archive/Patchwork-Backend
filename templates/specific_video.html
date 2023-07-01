@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <meta property="og:url" content="{{ video_url }}" />
 <meta property="og:video:url" content="{{ video_url }}" />
 <meta property="og:video:height" content="720" />
@@ -5,7 +6,7 @@
 <meta property="og:type" content="video.other" />
 <meta property="og:video:type" content="text/html" />
 
-<!DOCTYPE html>
+
 <html>
   <head>
     <title>Rabbit Hole Archive Random Video Player</title>
@@ -120,6 +121,7 @@
           autoplay
           onended="chooseRandomVideo()"
           onplay="updateVideoInfoFromNDJSON()"
+          poster="https://f005.backblazeb2.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/{{video_id}}.jpg"
         ></video>
       </div>
       <div id="videoInfo">
@@ -191,7 +193,9 @@
             if (video_id) {
               const videoURL = `https://cdn.pinapelz.com/VTuber%20Covers%20Archive/${video_id}.webm`;
               const videoElement = document.getElementById("video");
+              const thumbnailUrl = "https://f005.backblazeb2.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/"+data.video_id+".jpg";
               videoElement.src = videoURL;
+              videoElement.poster = thumbnailUrl;
               videoElement.play();
               updateVideoInfo(
                 video_id,
