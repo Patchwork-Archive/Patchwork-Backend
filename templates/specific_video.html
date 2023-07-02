@@ -116,17 +116,17 @@
   </head>
   <body>
     <div id="container">
-      <a href="https://archive.pinapelz.moe"><h1>vtuber music archive uwu moe kyun</h1></a>
+      <a href="{{domain}}"><h1>vtuber music archive uwu moe kyun</h1></a>
       <div id="videoPlayer">
         <video
           id="video"
           controls
           width="640"
           height="360"
-          src="https://cdn.pinapelz.com/VTuber%20Covers%20Archive/{{ video_id }}.webm"
+          src="{{cdn}}/{{ video_id }}.webm"
           autoplay
           onplay="updateVideoInfoDB()"
-          poster="https://f005.backblazeb2.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/{{video_id}}.jpg"
+          poster="{{thumbnails_domain}}/{{video_id}}.jpg"
         ></video>
       </div>
       <div id="videoInfo">
@@ -196,7 +196,7 @@
 
       // Function to update the video information from NDJSON when manually playing a specific video
       function updateVideoInfoDB(videoId) {
-      const apiUrl = `https://archive.pinapelz.moe/api/video/${videoId}`;
+      const apiUrl = `{{domain}}/api/video/${videoId}`;
 
       fetch(apiUrl)
         .then((response) => response.json())
@@ -237,7 +237,7 @@
           } else if (videoId.includes("https://youtu.be/")) {
             videoId = videoId.replace("https://youtu.be/", "");
           }
-          const videoURL = `https://cdn.pinapelz.com/VTuber%20Covers%20Archive/${videoId}.webm`;
+          const videoURL = `{{cdn}}/${videoId}.webm`;
           const videoElement = document.getElementById("video");
           videoElement.src = videoURL;
           videoElement.play();
