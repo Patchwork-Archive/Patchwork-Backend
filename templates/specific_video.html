@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<meta property="og:url" content="{{ video_url }}" />
-<meta property="og:video:url" content="{{ video_url }}" />
+<meta property="og:url" content="{{domain}}/watch?v={{ video_id }}" />
+<meta property="og:video:url" content="{{domain}}/watch?v={{ video_id }}" />
 <meta property="og:video:height" content="720" />
 <meta property="og:video:width" content="1280" />
 <meta property="og:type" content="video.other" />
@@ -10,6 +10,12 @@
 <html>
   <head>
     <title>Rabbit Hole Archive Random Video Player</title>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const videoId = "{{ video_id }}";
+        updateVideoInfoDB(videoId);
+      });
+    </script>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -119,37 +125,28 @@
           height="360"
           src="https://cdn.pinapelz.com/VTuber%20Covers%20Archive/{{ video_id }}.webm"
           autoplay
-          onended="chooseRandomVideo()"
-          onplay="updateVideoInfoFromNDJSON()"
+          onplay="updateVideoInfoDB()"
           poster="https://f005.backblazeb2.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/{{video_id}}.jpg"
         ></video>
       </div>
       <div id="videoInfo">
-        <p><strong>Video ID:</strong> <span id="videoId">{{video_id}}</span></p>
-        <p><strong>Title:</strong> <span id="title"></span>{{title}}</p>
+        <p><strong>Video ID:</strong> <span id="videoId"></span></p>
+        <p><strong>Title:</strong> <span id="title"></span></p>
         <p>
           <strong>Channel Name:</strong>
-          <span id="channelName"></span>{{channel_name}}
+          <span id="channelName"></span>
         </p>
         <p>
           <strong>Published Date:</strong>
-          <span id="publishedDate">{{published_date}}</span>
+          <span id="publishedDate"></span>
         </p>
         <p>
           <strong>Description:</strong><br /><span
             id="description"
             style="display: none"
-            >{{description}}</span
+            >/span
           >
         </p>
-
-        <script>
-          const formattedDescription = description.replace(/\\n|\n/g, "<br>");
-          const descriptionElement = document.getElementById("description");
-          descriptionElement.innerHTML = formattedDescription;
-          descriptionElement.style.display = "block";
-        </script>
-
         <a href="#" id="readMoreLink">Read More</a>
       </div>
       <form id="specificVideoForm">
@@ -157,7 +154,7 @@
         <input type="submit" value="Play Specific Video" />
         <div>
           <p>If you are on iOS please download the VLC Media Player App</p>
-          <a href="vlc://{{video_url}}">Open in VLC</a>
+          <a href="vlc://https://{{domain}}/watch?v={{video_id}}">Open in VLC</a>
         </div>
       </form>
     </div>
@@ -178,41 +175,6 @@
         });
 
       // Function to choose and play a random video
-      function chooseRandomVideo() {
-        fetch(
-          "https://raw.githubusercontent.com/Pinapelzx/CoversArchive/main/covers.ndjson"
-        )
-          .then((response) => response.text())
-          .then((ndjson) => {
-            const lines = ndjson.trim().split("\n");
-            const randomLine = lines[Math.floor(Math.random() * lines.length)];
-            const data = JSON.parse(randomLine);
-
-            const { video_id, title, channel_name, upload_date, description } =
-              data;
-            if (video_id) {
-              const videoURL = `https://cdn.pinapelz.com/VTuber%20Covers%20Archive/${video_id}.webm`;
-              const videoElement = document.getElementById("video");
-              const thumbnailUrl = "https://f005.backblazeb2.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/"+data.video_id+".jpg";
-              videoElement.src = videoURL;
-              videoElement.poster = thumbnailUrl;
-              videoElement.play();
-              updateVideoInfo(
-                video_id,
-                title,
-                channel_name,
-                upload_date,
-                description
-              );
-              updateVideoInfoFromNDJSON(video_id);
-            } else {
-              console.error("Invalid JSON data");
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching ndjson file:", error);
-          });
-      }
 
       // Function to update the video information on the screen
       function updateVideoInfo(
@@ -222,54 +184,44 @@
         publishedDate,
         description
       ) {
+        description = description.replace(/(?:\r\n|\r|\n)/g, "<br>");
         document.getElementById("videoId").innerText = videoId;
         document.getElementById("title").innerText = title;
         document.getElementById("channelName").innerText = channelName;
         document.getElementById("publishedDate").innerText = publishedDate;
-        document.querySelector('meta[name="og:url"]').setAttribute("content", video_url);
-        document.querySelector('meta[name="og:video:url"]').setAttribute("content", video_url);
-
         const descriptionElement = document.getElementById("description");
         descriptionElement.innerHTML = description.replace(/\n/g, "<br>");
         makeLinksClickable();
       }
 
       // Function to update the video information from NDJSON when manually playing a specific video
-      function updateVideoInfoFromNDJSON(videoId) {
-        fetch(
-          "https://raw.githubusercontent.com/Pinapelzx/CoversArchive/main/covers.ndjson"
-        )
-          .then((response) => response.text())
-          .then((ndjson) => {
-            const lines = ndjson.trim().split("\n");
-            const videoLine = lines.find((line) => {
-              const data = JSON.parse(line);
-              return data.video_id === videoId;
-            });
+      function updateVideoInfoDB(videoId) {
+      const apiUrl = `https://archive.pinapelz.moe/api/video/${videoId}`;
 
-            if (videoLine) {
-              const data = JSON.parse(videoLine);
-              const {
-                video_id,
-                title,
-                channel_name,
-                upload_date,
-                description,
-              } = data;
-              const formattedDescription = description.replace(/\\n/g, "<br>");
-              updateVideoInfo(
-                video_id,
-                title,
-                channel_name,
-                upload_date,
-                formattedDescription
-              );
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching ndjson file:", error);
-          });
-      }
+      fetch(apiUrl)
+        .then((response) => response.json())
+        .then((data) => {
+          const {
+            video_id,
+            title,
+            channel_name,
+            upload_date,
+            description,
+          } = data;
+          const formattedDescription = description.replace(/\\n/g, "<br>");
+          updateVideoInfo(
+            video_id,
+            title,
+            channel_name,
+            upload_date,
+            formattedDescription
+          );
+        })
+        .catch((error) => {
+          console.error("Error fetching video info:", error);
+        });
+    }
+
 
       // Handle the form submission to play a specific video
       document
@@ -290,7 +242,7 @@
           videoElement.src = videoURL;
           videoElement.play();
           updateVideoInfo(videoId, "", "", "");
-          updateVideoInfoFromNDJSON(videoId);
+          updateVideoInfoDB(videoId);
           videoIdInput.value = ""; // Clear the input field
         });
 
@@ -324,6 +276,7 @@
           event.preventDefault();
           toggleDescription();
         });
+
     </script>
   </body>
 </html>

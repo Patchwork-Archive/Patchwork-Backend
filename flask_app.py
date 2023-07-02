@@ -29,7 +29,9 @@ def create_database_connection():
 
 @app.route("/")
 def random_video_player():
-    return render_template("random_video.html")
+    return render_template("random_video.html",
+                           domain=CONFIG.get("site", "domain"),
+                           )
 
 @app.route("/video/<video_id>")
 def specific_video(video_id):
@@ -39,10 +41,7 @@ def specific_video(video_id):
         return render_template(
             "specific_video.html",
             video_id=data[0][0],
-            title=data[0][1],
-            channel_name=data[0][2],
-            published_date=data[0][4],
-            description=data[0][5]
+            domain=CONFIG.get("site", "domain"),
         )
     server.close_connection()
     return render_template("404.html")
@@ -81,7 +80,7 @@ def api_get_video_data(video_id):
     server.close_connection()
     return {"error": "Video ID does not exist"}
 
-@app.route("/api/video/random_video")
+@app.route("/api/random_video")
 def api_get_random_video():
     server = create_database_connection()
     data = server.get_random_row(table_name="songs")

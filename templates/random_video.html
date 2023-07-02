@@ -115,11 +115,12 @@
   <script>
     function loadRandomVideo() {
       console.log("Loading random video...");
-      fetch("https://archive.pinapelz.moe/api/video/random_video")
+      fetch("{{domain}}/api/random_video")
         .then(response => response.json())
         .then(data => {
           // Extract the video URL from the response data
           const videoUrl = "https://cdn.pinapelz.com/VTuber%20Covers%20Archive/" + data.video_id + ".webm";
+          
           // Create a video element to embed the video
           const videoPlayer = document.querySelector(".video-wrapper video");
           const thumbnailUrl = "https://f005.backblazeb2.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/"+data.video_id+".jpg";
