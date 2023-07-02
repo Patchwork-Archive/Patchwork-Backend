@@ -22,7 +22,7 @@ def create_database_connection():
     ssh_username = CONFIG.get("database", "ssh_username")
     ssh_password = CONFIG.get("database", "ssh_password")
     remote_bind = CONFIG.get("database", "remote_bind")
-    if ssh_host == "" or ssh_username == "" or ssh_password == "":
+    if ssh_host.strip() == "" or ssh_username.strip() == "" or ssh_password.strip() == "":
         return SQLHandler(hostname, user, password, database)
     return SQLHandler(hostname, user, password, database, ssh_host, ssh_username, ssh_password, remote_bind)
 
