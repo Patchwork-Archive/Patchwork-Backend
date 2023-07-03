@@ -149,10 +149,11 @@ nav a {
   color: #ffffff; /* Text color */
 }
 
-#language-selection select {
-  padding: 10px; /* Increased padding */
-  border: 1px solid #ffffff; /* Border color */
-  border-radius: 3px;
+.video-separator {
+  border: none;
+  border-top: 1px solid #ffffff; /* Color of the line separator */
+  margin: 30px auto; 
+  width: 50%;
 }
 
 .video-grid {

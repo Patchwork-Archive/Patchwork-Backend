@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import fileutil
 from sql_handler import SQLHandler
 from flask_cors import CORS
+import random
+import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -30,7 +32,15 @@ def create_database_connection():
     return SQLHandler(hostname, user, password, database, ssh_host, ssh_username, ssh_password, remote_bind)
 
 
-@app.route("/")
+def pick_featured_videos(max_videos: int):
+    today = datetime.date.today()
+    date_integer = int(today.strftime("%Y%m%d"))
+    random.seed(date_integer)
+    n1 = random.randint(1, max_videos)
+    n2 = random.randint(1, max_videos)
+    return n1, n2
+
+@app.route("/random")
 def random_video_player():
     return render_template(
         "random_video.html",
@@ -39,23 +49,26 @@ def random_video_player():
         thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
         )
 
-@app.route("/landing")
+@app.route("/")
 def landing_page():
     server = create_database_connection()
     video_count = request.args.get('count') if request.args.get('count') is not None else 6
     data = server.get_random_row(table_name="songs", limit=video_count)
-    videos = []
-    for video in data:
-        dict_data = {}
-        dict_data["video_id"] = video[0]
-        dict_data["title"] = video[1]
-        dict_data["channel_name"] = video[2]
-        dict_data["channel_id"] = video[3]
-        dict_data["upload_date"] = video[4]
-        dict_data["description"] = video[5]
-        videos.append(dict_data)
+    videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
+    archived_data = server.get_query_result("SELECT * FROM songs ORDER BY id DESC LIMIT 6;" )
+    recent_archived_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in archived_data]
+    max_rows = server.get_query_result("SELECT COUNT(*) FROM songs")
+    featured_indexes = pick_featured_videos(max_rows[0][0])
+    featured_query = f"SELECT * FROM songs WHERE id IN ({featured_indexes[0]}, {featured_indexes[1]})"
+    featured_data = server.get_query_result(featured_query)
+    featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
     server.close_connection()
-    return render_template("landing.html", videos=videos, thumbnails_domain=SITE_CONFIG["thumbnails_domain"])
+    return render_template("landing.html", 
+                            videos=videos,
+                            thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
+                            recent_archived_videos=recent_archived_videos,
+                            featured_videos=featured_videos,
+                           )
 
 @app.route("/watch")
 def watch_video():

@@ -21,8 +21,28 @@
   </header>
 
   <main>
+    <section id="featured-videos">
+      <h2>Daily Featured</h2>
+      <div class="video-grid">
+        {% for video in featured_videos %}
+        <div class="video">
+          <div class="thumbnail">
+            <a href="/watch?v={{ video['video_id'] }}">
+              <img src="{{ thumbnails_domain }}/{{video['video_id']}}.jpg" alt="Video Thumbnail">
+            </a>
+          </div>
+          <div class="details">
+            <a href="/watch?v={{ video['video_id'] }}">
+              <h3>{{ video['title'] }}</h3>
+            </a>
+            <p>{{ video['channel_name'] }} - {{video['upload_date']}}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
     <section id="random-videos">
-      <h2>Random Videos</h2>
+      <h2>Discover</h2>
       <div class="video-grid">
         {% for video in videos %}
         <div class="video">
@@ -41,38 +61,26 @@
         {% endfor %}
       </div>
     </section>
-    
+    <hr class="video-separator">
 
-    <section id="recommended-videos">
-      <h2>Recommended Videos</h2>
+    <section id="recently-archived">
+      <h2>Recently Archived</h2>
       <div class="video-grid">
+        {% for video in recent_archived_videos %}
         <div class="video">
           <div class="thumbnail">
-            <a href="/watch?v=ZzWQbqWZT5Q">
-              <img src="https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/ZzWQbqWZT5Q.jpg" alt="Video 5 Thumbnail">
+            <a href="/watch?v={{ video['video_id'] }}">
+              <img src="{{ thumbnails_domain }}/{{video['video_id']}}.jpg" alt="Video Thumbnail">
             </a>
           </div>
           <div class="details">
-            <a href="/watch?v=ZzWQbqWZT5Q">
-              <h3>「ピースサイン」獅子神レオナ / Peace Sign【歌ってみた】TVアニメ「僕のヒーローアカデミア」OP</h3>
+            <a href="/watch?v={{ video['video_id'] }}">
+              <h3>{{ video['title'] }}</h3>
             </a>
-            <p>Placeholder Video</p>
+            <p>{{ video['channel_name'] }} - {{video['upload_date']}}</p>
           </div>
         </div>
-
-        <div class="video">
-          <div class="thumbnail">
-            <a href="/watch?v=OXr8T40i8Q0">
-              <img src="https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/OXr8T40i8Q0.jpg" alt="Video 6 Thumbnail">
-            </a>
-          </div>
-          <div class="details">
-            <a href="/watch?v=OXr8T40i8Q0">
-              <h3>【Siska Leontyne】Yoru Ni Kakeru / 夜に駆ける【Cover】</h3>
-            </a>
-            <p>Placeholder Video</p>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </section>
   </main>
