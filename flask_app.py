@@ -36,8 +36,26 @@ def random_video_player():
         "random_video.html",
         domain=SITE_CONFIG["domain"],
         cdn=SITE_CONFIG["cdn"],
-        humbnails_domain=SITE_CONFIG["thumbnails_domain"],
+        thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
         )
+
+@app.route("/landing")
+def landing_page():
+    server = create_database_connection()
+    video_count = request.args.get('count') if request.args.get('count') is not None else 6
+    data = server.get_random_row(table_name="songs", limit=video_count)
+    videos = []
+    for video in data:
+        dict_data = {}
+        dict_data["video_id"] = video[0]
+        dict_data["title"] = video[1]
+        dict_data["channel_name"] = video[2]
+        dict_data["channel_id"] = video[3]
+        dict_data["upload_date"] = video[4]
+        dict_data["description"] = video[5]
+        videos.append(dict_data)
+    server.close_connection()
+    return render_template("landing.html", videos=videos, thumbnails_domain=SITE_CONFIG["thumbnails_domain"])
 
 @app.route("/watch")
 def watch_video():
@@ -86,6 +104,7 @@ def api_get_random_video():
     dict_data["description"] = data[0][5]
     server.close_connection()
     return dict_data
+
 
 @app.route("/api/stats")
 def api_get_stats():

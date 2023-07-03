@@ -68,7 +68,7 @@ class SQLHandler:
 
     def _load_database(self, database_name: str):
         try:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor(buffered=True)
         except Error as err:
             print(f"Failed to load database: {err}")
             exit(1)
@@ -86,7 +86,7 @@ class SQLHandler:
                 exit(1)
 
     def create_table(self, name: str, column: str):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(f"CREATE TABLE {name} ({column})")
             print(f"Table {name} created successfully")
@@ -94,7 +94,7 @@ class SQLHandler:
             print(err)
 
     def insert_row(self, name: str, column: str, data: tuple):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             placeholders = ', '.join(['%s'] * len(data))
             query = f"INSERT INTO {name} ({column}) VALUES ({placeholders})"
@@ -117,7 +117,7 @@ class SQLHandler:
 
 
     def clear_table(self, name: str):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(f"DELETE FROM {name}")
             self.connection.commit()
@@ -127,7 +127,7 @@ class SQLHandler:
             print(err)
 
     def reset_auto_increment(self, name: str):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(f"ALTER TABLE {name} AUTO_INCREMENT = 1")
             self.connection.commit()
@@ -137,7 +137,7 @@ class SQLHandler:
             print(err)
 
     def copy_rows_to_new_table(self, name: str, new_name: str, column: str):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(
                 f"INSERT INTO {new_name} ({column}) SELECT {column} FROM {name}")
@@ -150,7 +150,7 @@ class SQLHandler:
             print(err)
 
     def drop_table(self, name: str):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(f"DROP TABLE {name}")
             self.connection.commit()
@@ -163,7 +163,7 @@ class SQLHandler:
         """
         Checks if a row exists in a table
         """
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(f"SELECT * FROM {table_name} WHERE {column_name} = '{value}'")
             result = cursor.fetchone()
@@ -179,7 +179,7 @@ class SQLHandler:
         """
         Updates a row in a table
         """
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(f"UPDATE {name} SET {replace_col} = '{new_value}' WHERE {column_name} = '{search_val}'")
             self.connection.commit()
@@ -189,7 +189,7 @@ class SQLHandler:
             print(err)
     
     def execute_query(self, query: str):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(query)
             result = cursor.fetchall()
@@ -199,7 +199,7 @@ class SQLHandler:
             print(err)
     
     def get_query_result(self, query: str):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(query)
             result = cursor.fetchall()
@@ -209,7 +209,7 @@ class SQLHandler:
             print(err)
     
     def get_random_row(self,table_name: str, limit: int = 1):
-        cursor = self.connection.cursor()
+        cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(f"SELECT * FROM {table_name} ORDER BY RAND() LIMIT {str(limit)}")
             result = cursor.fetchall()

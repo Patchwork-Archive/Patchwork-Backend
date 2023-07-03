@@ -1,0 +1,181 @@
+/* styles.css */
+
+/* Reset default browser styles */
+body, h1, h2, h3, p, ul, li {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Dark theme */
+body {
+  background-color: #1c1c1c;
+  color: #ffffff;
+}
+
+/* Header styles */
+header {
+  background-color: #2A4B71;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+#logo img {
+  width: 120px; /* Increased logo size */
+  height: auto;
+}
+
+#search-bar {
+  display: flex;
+  flex-grow: 1; /* Take remaining space in the header */
+  justify-content: center; /* Center the search bar */
+  align-items: center; /* Center the search bar */
+  margin-top: 10px; /* Added margin-top to separate from logo on mobile */
+}
+
+#search-bar input[type="text"] {
+  width: 100%; /* Take full width on smaller screens */
+  padding: 10px; /* Increased padding */
+  background-color: #383838; /* Darker background color */
+  border: none;
+  border-radius: 3px;
+  color: #ffffff; /* Text color */
+  max-width: 600px; /* Set maximum width for the search input */
+  margin: 0 10px; /* Added left and right margin to make it shorter on both sides */
+}
+
+#search-button {
+  padding: 10px 20px; /* Increased padding */
+  background-color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #000000; /* Text color */
+}
+
+#user-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#user-actions button {
+  padding: 10px 20px; /* Increased padding */
+  background-color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #000000; /* Text color */
+}
+
+#user-actions img {
+  width: 40px; /* Increased image size */
+  height: 40px;
+  border-radius: 50%;
+}
+
+
+
+/* Main content styles */
+main {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px; /* Increased margin-bottom */
+}
+
+.video {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px; /* Increased margin-bottom */
+}
+
+.thumbnail img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.details {
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
+.details a {
+  text-decoration: none;
+  color: #ffffff; /* Text color */
+}
+
+.details a:hover {
+  text-decoration: underline;
+}
+
+.details h3 {
+  font-size: 20px; /* Increased font size */
+  font-weight: bold;
+  margin-bottom: 10px; /* Increased margin-bottom */
+}
+
+.details p {
+  color: #b8b8b8; /* Lighter text color */
+  margin-bottom: 5px; /* Increased margin-bottom */
+}
+
+/* Footer styles */
+footer {
+  background-color: #383838; /* Darker background color */
+  padding: 20px; /* Increased padding */
+}
+
+nav ul {
+  display: flex;
+  list-style-type: none;
+}
+
+nav li {
+  margin-right: 10px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #ffffff; /* Text color */
+}
+
+#language-selection select {
+  padding: 10px; /* Increased padding */
+  border: 1px solid #ffffff; /* Border color */
+  border-radius: 3px;
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+@media screen and (max-width: 600px) {
+  .video {
+    flex-direction: column;
+  }
+
+  .thumbnail {
+    flex: 0 0 auto;
+    margin-right: 0;
+    margin-bottom: 20px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .details {
+    margin-top: 0;
+  }
+}
+
