@@ -1,34 +1,16 @@
-# Video-Archive-Viewer
+# Video-Archive-Server
 
-Demo front end for Video-Archive-Viewer
+A Python Flask server that serves archived videos and metadata from a MySQL database.
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/pinapelz/video-archive-viewer.git
-git branch -M main
-git push -uf origin main
-```
+Videos and thumbnails can be hosted in a S3 compatible bucket and served through a CDN.
 
-## Integrate with your tools
+A very messy archiving script can be found [here](https://github.com/pinapelz/Video-Archive-Worker) however so long as the database is populated with the correct information, the server will work.
 
-- [ ] [Set up project integrations](https://gitlab.com/pinapelz/video-archive-viewer/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Search is not implemented yet
 
 ---
+![image](https://github.com/pinapelz/Video-Archive-Server/assets/21994085/eb626166-f6db-43c9-89d3-4986c6a8d2cd)
+
+![image](https://github.com/pinapelz/Video-Archive-Server/assets/21994085/2602aadb-5b33-4659-9da5-117aa2f92e3f)
+
+The overall design and idea is heavily inspired by [Ragtag Archive](https://archive.ragtag.moe/)
