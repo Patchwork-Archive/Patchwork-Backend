@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/video.css') }}">
+  <title>Video Viewer</title>
+</head>
+<body>
+  <header>
+    <div id="search-bar">
+      <input type="text" placeholder="Search is currently disabled!">
+      <button id="search-button">Search</button>
+    </div>
+    <div id="logo">
+      <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo">
+    </div>
+  </header>
+
+  <main>
+    <div class="content">
+      <div class="video">
+        <video src="{{cdn}}/{{ video_id }}.webm" controls></video>
+        <div class="details">
+          <h3>{{video_title}}</h3>
+          <p>{{channel_name}}</p>
+          <p>{{upload_date}}</p>
+          <br>
+          <h2>Description</h2>
+          <p id="description" class="description-content collapsed">{{ description | safe }}</p>
+          <button id="toggle-description" class="toggle-button" onclick="toggleDescription()">Show More</button>
+        </div>
+      </div>
+      <script>
+    function toggleDescription() {
+      var description = document.getElementById("description");
+      var toggleButton = document.getElementById("toggle-description");
+
+      if (description.classList.contains("collapsed")) {
+        description.classList.remove("collapsed");
+        toggleButton.innerHTML = "Show Less";
+        description.style.maxHeight = "none"; 
+      } else {
+        description.classList.add("collapsed");
+        toggleButton.innerHTML = "Show More";
+        description.style.maxHeight = "";
+      }
+    }
+      </script>
+      <div class="discover">
+        <h2>Discover</h2>
+        <div class="video-grid">
+          {% for video in discover_videos %}
+            <div class="video">
+              <a href="/watch?v={{ video['video_id'] }}" target="_blank">
+                <img src="{{ thumbnails_domain }}/{{video['video_id']}}.jpg" alt="Video Thumbnail 1">
+              </a>
+              <div class="details">
+                <h3>{{ video['title'] }}</h3>
+                <p>{{ video['channel_name'] }} - {{video['upload_date']}}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          
+      </div>
+    </div>
+
+  </main>
+</body>
+</html>

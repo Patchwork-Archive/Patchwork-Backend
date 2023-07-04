@@ -5,6 +5,7 @@ from flask_cors import CORS
 from webapi.cloudflare import CloudflareAPI
 import random
 import datetime
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -79,19 +80,26 @@ def landing_page():
 def watch_video():
     server = create_database_connection()
     video_id = request.args.get('v')
-    print(video_id)
     if server.check_row_exists(table_name="songs", column_name="video_id", value=video_id):
-        data = server.get_query_result(f"SELECT * FROM songs WHERE video_id = '{video_id}'")
+        video_data = server.get_query_result(f"SELECT * FROM songs WHERE video_id = '{video_id}'")
+        discover_data = server.get_random_row(table_name="songs", limit=5)
+        discover_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in discover_data]
         server.close_connection()
-        return render_template(
-            "specific_video.html",
-            video_id=data[0][0],
-            domain=SITE_CONFIG["domain"],
-            cdn=SITE_CONFIG["cdn"],
-            humbnails_domain=SITE_CONFIG["thumbnails_domain"],
-        )
+        description = re.sub(r'\\n', '<br>', video_data[0][5])
+        return render_template("video.html",
+                                discover_videos = discover_videos,
+                                video_id=video_data[0][0],
+                                domain=SITE_CONFIG["domain"],
+                                cdn=SITE_CONFIG["cdn"],
+                                thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
+                                video_title = video_data[0][1],
+                                channel_name = video_data[0][2],
+                                upload_date = video_data[0][4],
+                                description = description,
+                               )
     server.close_connection()
     return render_template("404.html")
+
 
 @app.route("/api/video/<video_id>")
 def api_get_video_data(video_id):

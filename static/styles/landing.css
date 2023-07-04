@@ -54,28 +54,6 @@ header {
   color: #000000; /* Text color */
 }
 
-#user-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#user-actions button {
-  padding: 10px 20px; /* Increased padding */
-  background-color: #ffffff;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  color: #000000; /* Text color */
-}
-
-#user-actions img {
-  width: 40px; /* Increased image size */
-  height: 40px;
-  border-radius: 50%;
-}
-
-
 
 /* Main content styles */
 main {
