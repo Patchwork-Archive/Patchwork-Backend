@@ -61,6 +61,8 @@
           <h3>{{video_title}}</h3>
           <p>{{channel_name}}</p>
           <p>{{upload_date}}</p>
+          <button id="open-vlc-button" onclick="openInVLC('{{cdn}}/{{ video_id }}.webm')">Open in VLC</button>
+          <br>
           <br>
           <h2>Description</h2>
           <p id="description" class="description-content collapsed">{{ description | safe }}</p>
@@ -81,6 +83,9 @@
         toggleButton.innerHTML = "Show More";
         description.style.maxHeight = "";
       }
+    }
+    function openInVLC(url) {
+      window.location.href = 'vlc://' + encodeURIComponent(url);
     }
       </script>
       <div class="discover">
