@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import fileutil
 from sql_handler import SQLHandler
 from flask_cors import CORS
+from webapi.cloudflare import CloudflareAPI
 import random
 import datetime
 
@@ -52,6 +53,7 @@ def random_video_player():
 @app.route("/")
 def landing_page():
     server = create_database_connection()
+    storage_api = CloudflareAPI(CONFIG["storage"]["api_token"], CONFIG["storage"]["accountID"], CONFIG["storage"]["bucket_name"])
     video_count = request.args.get('count') if request.args.get('count') is not None else 6
     data = server.get_random_row(table_name="songs", limit=video_count)
     videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
@@ -63,11 +65,14 @@ def landing_page():
     featured_data = server.get_query_result(featured_query)
     featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
     server.close_connection()
+    number_of_files = int(storage_api.get_number_of_files())
     return render_template("landing.html", 
                             videos=videos,
                             thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
                             recent_archived_videos=recent_archived_videos,
                             featured_videos=featured_videos,
+                            archived_videos_count=f"{number_of_files:,}" if number_of_files >= 10000 else str(number_of_files), #　Pretty print the number of files
+                            archive_size=str(round(int(storage_api.get_storage_used())/ (1024 **3), 2)),
                            )
 
 @app.route("/watch")
@@ -77,6 +82,7 @@ def watch_video():
     print(video_id)
     if server.check_row_exists(table_name="songs", column_name="video_id", value=video_id):
         data = server.get_query_result(f"SELECT * FROM songs WHERE video_id = '{video_id}'")
+        server.close_connection()
         return render_template(
             "specific_video.html",
             video_id=data[0][0],
@@ -84,7 +90,6 @@ def watch_video():
             cdn=SITE_CONFIG["cdn"],
             humbnails_domain=SITE_CONFIG["thumbnails_domain"],
         )
-    server.c
     server.close_connection()
     return render_template("404.html")
 

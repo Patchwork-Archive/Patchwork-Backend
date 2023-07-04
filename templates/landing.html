@@ -11,16 +11,21 @@
 
 <body>
   <header>
-    <div id="logo">
-      <img src="Banana-Single.jpg/800px-Banana-Single.jpg" alt="Really Awesome Logo">
-    </div>
     <div id="search-bar">
-      <input type="text" placeholder="Search">
+      <input type="text" placeholder="Search is currently disabled! Sorry!">
       <button id="search-button">Search</button>
+    </div>
+    <div id="logo">
+      <img src="{{url_for('static', filename='img/logo.png')}}" alt="Nijitracker Logo">
     </div>
   </header>
 
   <main>
+    <div class="message">
+      <h2>Welcome to the VTuber Music Archives</h2>
+      <p>We have {{archived_videos_count}} videos archived taking up {{archive_size}} GB of storage space.</p>
+    </div>
+
     <section id="featured-videos">
       <h2>Daily Featured</h2>
       <div class="video-grid">

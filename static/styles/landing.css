@@ -13,7 +13,6 @@ body {
   color: #ffffff;
 }
 
-/* Header styles */
 header {
   background-color: #2A4B71;
   display: flex;
@@ -23,8 +22,9 @@ header {
 }
 
 #logo img {
-  width: 120px; /* Increased logo size */
-  height: auto;
+  width: 48px; /* Increased logo size */
+  height: 50%;
+  margin-right: 10px;
 }
 
 #search-bar {
@@ -32,18 +32,17 @@ header {
   flex-grow: 1; /* Take remaining space in the header */
   justify-content: center; /* Center the search bar */
   align-items: center; /* Center the search bar */
-  margin-top: 10px; /* Added margin-top to separate from logo on mobile */
 }
 
 #search-bar input[type="text"] {
-  width: 100%; /* Take full width on smaller screens */
-  padding: 10px; /* Increased padding */
+  width: 100%; 
+  padding: 10px; 
   background-color: #383838; /* Darker background color */
   border: none;
   border-radius: 3px;
   color: #ffffff; /* Text color */
   max-width: 600px; /* Set maximum width for the search input */
-  margin: 0 10px; /* Added left and right margin to make it shorter on both sides */
+  margin: 0 10px;
 }
 
 #search-button {
@@ -129,7 +128,6 @@ h2 {
   margin-bottom: 5px; /* Increased margin-bottom */
 }
 
-/* Footer styles */
 footer {
   background-color: #383838; /* Darker background color */
   padding: 20px; /* Increased padding */
@@ -180,3 +178,23 @@ nav a {
   }
 }
 
+.message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 70px;
+  margin-bottom: 30px;
+}
+
+.message h2 {
+  font-size: 32px; 
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.message p {
+  font-size: 18px;
+  color: #b8b8b8;
+  margin-bottom: 20px;
+}
