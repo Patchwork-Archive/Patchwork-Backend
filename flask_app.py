@@ -69,6 +69,7 @@ def landing_page():
     number_of_files = int(storage_api.get_number_of_files())
     return render_template("landing.html", 
                             videos=videos,
+                            domain=SITE_CONFIG["domain"],
                             thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
                             recent_archived_videos=recent_archived_videos,
                             featured_videos=featured_videos,
