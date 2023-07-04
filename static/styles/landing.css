@@ -138,24 +138,6 @@ nav a {
   gap: 20px;
 }
 
-@media screen and (max-width: 600px) {
-  .video {
-    flex-direction: column;
-  }
-
-  .thumbnail {
-    flex: 0 0 auto;
-    margin-right: 0;
-    margin-bottom: 20px;
-    max-width: 100%;
-    height: auto;
-  }
-
-  .details {
-    margin-top: 0;
-  }
-}
-
 .message {
   display: flex;
   flex-direction: column;
@@ -175,4 +157,39 @@ nav a {
   font-size: 18px;
   color: #b8b8b8;
   margin-bottom: 20px;
+}
+@media screen and (max-width: 600px) {
+  .video {
+    flex-direction: column;
+  }
+
+  .thumbnail {
+    flex: 0 0 auto;
+    margin-right: 0;
+    margin-bottom: 20px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .details {
+    margin-top: 0;
+  }
+
+  #logo img {
+    display: none;
+  }
+
+  nav ul {
+    list-style-type: none;
+    margin-bottom: 20px;
+  }
+  
+  nav li {
+    margin-right: 0px;
+  }
+  
+  nav a {
+    padding: 5px;
+    font-size: 14px;
+  }
 }

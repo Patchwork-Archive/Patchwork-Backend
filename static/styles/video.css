@@ -4,7 +4,7 @@ body, h1, h2, h3, p, ul, li {
     padding: 0;
     font-family: Arial, sans-serif;
   }
-  
+
   nav ul li:first-child {
     margin-right: auto;
   }
@@ -98,16 +98,16 @@ body, h1, h2, h3, p, ul, li {
     color: #ffffff;
   }
   .details h2 {
-    font-size: 20px; /* Increased font size */
+    font-size: 20px;
     font-weight: bold;
-    margin-bottom: 10px; /* Increased margin-bottom */
+    margin-bottom: 10px;
     color: #ffffff;
   }
   
   .details p {
-    color: #ffffff; /* Lighter text color */
-    margin-bottom: 5px; /* Increased margin-bottom */
-    font-size: 18px; /* Decreased font size */
+    color: #ffffff;
+    margin-bottom: 5px;
+    font-size: 18px;
   }
   
   .discover {
@@ -117,6 +117,7 @@ body, h1, h2, h3, p, ul, li {
   .discover h2 {
     font-size: 24px;
     font-weight: bold;
+    margin-top: 20px;
     margin-bottom: 10px;
     color: #ffffff;
   }
@@ -170,7 +171,24 @@ body, h1, h2, h3, p, ul, li {
     
     .video-grid .video {
       flex-direction: column;
+      align-items: center;
     }
+    .video-grid .details h3 {
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: #ffffff;
+      }
+      
+      .video-grid .details p {
+        color: #888888;
+        margin-bottom: 5px;
+      }
+
+      .video-grid .video img {
+        height: 177px;
+        object-fit: cover;
+      }
+    
   }
   
   .description-content {
