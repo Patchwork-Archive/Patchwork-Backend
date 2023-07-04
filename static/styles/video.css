@@ -5,6 +5,24 @@ body, h1, h2, h3, p, ul, li {
     font-family: Arial, sans-serif;
   }
   
+  nav ul li:first-child {
+    margin-right: auto;
+  }
+  
+  nav ul li:first-child a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 3px;
+    background-color: #2A4B71;
+  }
+  
+  nav ul li:first-child a:hover {
+    background-color: #ffffff;
+    color: #000000;
+  }
   body {
     background-color: #1f1f1f;
   }
