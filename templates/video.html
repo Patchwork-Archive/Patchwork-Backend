@@ -57,7 +57,7 @@
         <div class="video-grid">
           {% for video in discover_videos %}
             <div class="video">
-              <a href="/watch?v={{ video['video_id'] }}" target="_blank">
+              <a href="/watch?v={{ video['video_id'] }}">
                 <img src="{{ thumbnails_domain }}/{{video['video_id']}}.jpg" alt="Video Thumbnail 1">
               </a>
               <div class="details">
