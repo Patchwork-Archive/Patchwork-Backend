@@ -167,6 +167,23 @@ body, h1, h2, h3, p, ul, li {
     color: #ffffff;
     text-decoration: underline;
   }
+
+
+  #open-vlc-button {
+    padding: 10px 20px;
+    background-color: #2A4B71;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  #open-vlc-button:hover {
+    background-color: #2A4B71;
+  }
+
+
   /* Mobile Styles */
   @media (max-width: 768px) {
     header {
@@ -186,7 +203,11 @@ body, h1, h2, h3, p, ul, li {
       margin-right: 0;
       width: 75%;
     }
-    
+
+    #open-vlc-button {
+        font-size: 14px;
+      }
+
     .video-grid .video {
       flex-direction: column;
       align-items: center;
