@@ -111,6 +111,15 @@ footer {
   padding: 20px; /* Increased padding */
 }
 
+footer h2, footer a {
+  display: block;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none; 
+  color: #b8b8b8;
+  font-family: Arial, sans-serif;
+}
+
 nav ul {
   display: flex;
   list-style-type: none;
@@ -159,16 +168,6 @@ nav a {
   margin-bottom: 20px;
 }
 
-footer {
-  margin-top: 50px;
-}
-
-footer h2, footer a {
-  display: block;
-  font-size: 14px;
-  margin: 10px auto;
-  text-align: center;
-}
 
 
 @media screen and (max-width: 600px) {
