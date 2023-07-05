@@ -158,6 +158,19 @@ nav a {
   color: #b8b8b8;
   margin-bottom: 20px;
 }
+
+footer {
+  margin-top: 50px;
+}
+
+footer h2, footer a {
+  display: block;
+  font-size: 14px;
+  margin: 10px auto;
+  text-align: center;
+}
+
+
 @media screen and (max-width: 600px) {
   .video {
     flex-direction: column;
