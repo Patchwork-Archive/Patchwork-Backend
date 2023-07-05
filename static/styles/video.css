@@ -23,6 +23,11 @@ body, h1, h2, h3, p, ul, li {
     background-color: #ffffff;
     color: #000000;
   }
+
+  li::marker {
+    color: #2A4B71; /* Set the color of the marker */
+  }
+  
   body {
     background-color: #1f1f1f;
   }

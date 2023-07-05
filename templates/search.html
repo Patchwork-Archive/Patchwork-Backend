@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/search.css') }}">
+</head>
+
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+      </ul>
+    </nav>
+    <div id="search-bar">
+      <input type="text" placeholder="Search is currently disabled!">
+      <button id="search-button">Search</button>
+    </div>
+    <div id="logo">
+      <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo">
+    </div>
+  </header>
+
+  <div class="search-results">
+    <div class="search-result">
+      <img class="thumbnail" src="https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/mcg6Bg2wxso.jpg" alt="Thumbnail">
+      <div class="details">
+        <h3 class="title">Video Title 1</h3>
+        <p class="channel">Channel Name</p>
+        <p class="date">Date</p>
+      </div>
+    </div>
+
+    <div class="search-result">
+      <img class="thumbnail" src="https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/mcg6Bg2wxso.jpg" alt="Thumbnail">
+      <div class="details">
+        <h3 class="title">Video Title 2</h3>
+        <p class="channel">Channel Name</p>
+        <p class="date">Date</p>
+      </div>
+    </div>
+
+    <!-- Add more search result listings here -->
+
+  </div>
+</body>
+
+</html>
