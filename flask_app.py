@@ -101,6 +101,16 @@ def watch_video():
     server.close_connection()
     return render_template("404.html")
 
+@app.route("/results")
+def search_query():
+    server = create_database_connection()
+    search_terms = request.args.get('search_query')
+    data = server.search_video_row("songs", search_terms.split(), 14)
+    server.close_connection()
+    search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
+    return render_template("search.html", 
+                           search_result=search_result,
+                           thumbnails_domain=SITE_CONFIG["thumbnails_domain"],)
 
 @app.route("/api/video/<video_id>")
 def api_get_video_data(video_id):
@@ -140,4 +150,4 @@ def api_get_stats():
     return jsonify({"song_count": song_count[0][0]})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8000)

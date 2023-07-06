@@ -15,35 +15,25 @@
       </ul>
     </nav>
     <div id="search-bar">
-      <input type="text" placeholder="Search is currently disabled!">
-      <button id="search-button">Search</button>
+      <form action="/results" method="GET">
+        <input type="text" name="search_query" placeholder="Search">
+      </form>
     </div>
     <div id="logo">
       <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo">
     </div>
   </header>
-
   <div class="search-results">
-    <div class="search-result">
-      <img class="thumbnail" src="https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/mcg6Bg2wxso.jpg" alt="Thumbnail">
+    {% for video in search_result %}
+    <a href="/watch?v={{ video['video_id'] }}" class="search-result">
+      <img class="thumbnail" src="{{ thumbnails_domain }}/{{ video['video_id'] }}.jpg" alt="Thumbnail">
       <div class="details">
-        <h3 class="title">Video Title 1</h3>
-        <p class="channel">Channel Name</p>
-        <p class="date">Date</p>
+        <h3 class="title">{{ video['title'] }}</h3>
+        <p class="channel">{{ video['channel_name'] }}</p>
+        <p class="date">{{ video['upload_date'] }}</p>
       </div>
-    </div>
-
-    <div class="search-result">
-      <img class="thumbnail" src="https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails/mcg6Bg2wxso.jpg" alt="Thumbnail">
-      <div class="details">
-        <h3 class="title">Video Title 2</h3>
-        <p class="channel">Channel Name</p>
-        <p class="date">Date</p>
-      </div>
-    </div>
-
-    <!-- Add more search result listings here -->
-
+    </a>
+    {% endfor %}
   </div>
 </body>
 
