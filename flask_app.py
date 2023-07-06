@@ -110,6 +110,7 @@ def search_query():
     search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     return render_template("search.html", 
                            search_result=search_result,
+                           search_terms = search_terms,
                            thumbnails_domain=SITE_CONFIG["thumbnails_domain"],)
 
 @app.route("/api/video/<video_id>")
