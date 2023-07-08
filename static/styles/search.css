@@ -124,6 +124,41 @@ li::marker {
     align-items: flex-start;
   }
 
+  nav ul li:first-child {
+    margin-right: 0; /* Remove margin-right */
+    margin-bottom: 10px; /* Add margin-bottom for spacing */
+  }
+  
+  nav ul li:first-child a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px; /* Decrease font-size for smaller screens */
+    padding: 8px; /* Decrease padding for smaller screens */
+    border-radius: 3px;
+    background-color: #2A4B71;
+    display: block; /* Make the link a block element */
+    margin-bottom: 10px; /* Add margin-bottom for spacing */
+  }
+
+  #search-bar {
+    display: flex;
+    width: 100%;
+    margin: 0 20px; /* Decreased margin to 20px */
+    flex-grow: 2;
+  }
+  
+  #search-bar input[type="text"] {
+    width: 100%; /* Changed width to 100% */
+    padding: 8px; /* Decreased padding to 8px */
+    background-color: #383838;
+    border: none;
+    border-radius: 3px;
+    color: #ffffff;
+    max-width: 400px; /* Decreased max-width to 400px */
+    margin: 0;
+  }
+
   #logo {
     display: none;
   }

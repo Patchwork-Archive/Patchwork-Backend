@@ -150,5 +150,9 @@ def api_get_stats():
     song_count = server.get_query_result("SELECT COUNT(video_id) FROM songs")
     return jsonify({"song_count": song_count[0][0]})
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
 if __name__ == "__main__":
     app.run(debug=True, port=8000)
