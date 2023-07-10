@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, abort
 import fileutil
 from sql_handler import SQLHandler
 from flask_cors import CORS
@@ -10,6 +10,8 @@ import re
 app = Flask(__name__)
 CORS(app)
 
+QUEUE_PASSWORD = "change_me"
+WORKER_PASSWORD = "worker_password"
 
 if fileutil.check_file_exists("config.ini"):
     CONFIG = fileutil.read_config("config.ini")
@@ -153,6 +155,55 @@ def api_get_stats():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template("404.html"), 404
+
+@app.route("/api/worker/queue", methods=["POST"])
+def archive_url():
+    """
+    Endpoint for queueing a video to workers
+    """
+    password = request.headers.get('X-AUTHENTICATION')
+    if password != QUEUE_PASSWORD:
+        abort(401)
+
+    url = request.form.get('url')
+    if request.method == "POST":
+        server = create_database_connection()
+        server.create_table("archive_queue", "id INTEGER PRIMARY KEY AUTO_INCREMENT, url TEXT")
+        if server.check_row_exists("archive_queue", "url", url):
+            server.close_connection()
+            return "Already queued"
+        server.insert_row("archive_queue", "url", (url,))
+        server.close_connection()
+        return "OK"
+
+
+def get_next_video_in_queue():
+    """
+    Gets the next video in the queue
+    """
+    server = create_database_connection()
+    try:
+        next_video = server.get_query_result("SELECT url FROM archive_queue ORDER BY id LIMIT 1;")[0][0]
+    except IndexError:
+        server.close_connection()
+        return None
+    server.delete_row("archive_queue", "url", (next_video,))
+    server.close_connection()
+    return next_video
+
+
+@app.route("/api/worker/next", methods=["GET"])
+def get_next_in_queue():
+    """
+    Endpoint for workers to get the next video in the queue
+    """
+    password = request.args.get('password')
+    if password != WORKER_PASSWORD:
+        abort(401)
+    next_video = get_next_video_in_queue()
+    if next_video is None:
+        return "No videos in queue", 204
+    return next_video
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

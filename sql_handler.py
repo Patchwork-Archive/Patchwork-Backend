@@ -207,6 +207,19 @@ class SQLHandler:
         except Error as err:
             print("Error executing query")
             print(err)
+
+    def delete_row(self, name: str, column: str, data: tuple):
+        cursor = self.connection.cursor()
+        try:
+            query = f"DELETE FROM {name} WHERE {column} = %s"
+            cursor.execute(query, data)
+            self.connection.commit()
+            print("Data Deleted:", data)
+        except Error as err:
+            print("Error deleting data")
+            print(err)
+            return False
+        return True
     
     def get_random_row(self,table_name: str, limit: int = 1):
         cursor = self.connection.cursor(buffered=True)
