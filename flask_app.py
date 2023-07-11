@@ -197,7 +197,8 @@ def get_next_in_queue():
     """
     Endpoint for workers to get the next video in the queue
     """
-    password = request.args.get('password')
+    password = request.headers.get('X-AUTHENTICATION')
+    print(password)
     server = create_database_connection()
     try:
         if not server.check_row_exists("archive_worker_auth", "token", password):
