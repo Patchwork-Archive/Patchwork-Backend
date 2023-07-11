@@ -111,6 +111,32 @@ def search_query():
                            search_terms = search_terms,
                            thumbnails_domain=SITE_CONFIG["thumbnails_domain"],)
 
+@app.route("/status")
+def status_page():
+    database_status = "Online"
+    try:
+        server = create_database_connection()
+        server.close_connection()
+    except:
+        database_status = "Offline"
+        render_template("status.html",
+                        database_status=database_status,
+                        )
+    server = create_database_connection()
+    worker_data = server.get_query_result("SELECT * FROM worker_status")
+    workers = []
+    for worker in worker_data:
+        worker_dict = {}
+        worker_dict["name"] = worker[1]
+        worker_dict["status"] = worker[3]
+        worker_dict["timestamp"] = worker[4]
+        workers.append(worker_dict)
+    
+    return render_template("status.html",
+                           database_status=database_status,
+                           workers = workers,
+                           )
+
 @app.route("/api/video/<video_id>")
 def api_get_video_data(video_id):
     server = create_database_connection()
@@ -167,14 +193,14 @@ def archive_url():
     except:
         abort(401)
     url = request.form.get('url')
-    if request.method == "POST":
-        if server.check_row_exists("archive_queue", "url", url):
-            server.close_connection()
-            return "Already queued"
-        server.insert_row("archive_queue", "url", (url,))
-        server.insert_row("archive_log", "url, user, status, timestamp", (url, password, "Queued", datetime.datetime.now()))
+
+    if server.check_row_exists("archive_queue", "url", url):
         server.close_connection()
-        return "OK"
+        return "Already queued"
+    server.insert_row("archive_queue", "url", (url,))
+    server.insert_row("archive_log", "url, user, status, timestamp", (url, password, "Queued", datetime.datetime.now()))
+    server.close_connection()
+    return "OK", 200
 
 
 def get_next_video_in_queue():
@@ -198,7 +224,6 @@ def get_next_in_queue():
     Endpoint for workers to get the next video in the queue
     """
     password = request.headers.get('X-AUTHENTICATION')
-    print(password)
     server = create_database_connection()
     try:
         if not server.check_row_exists("archive_worker_auth", "token", password):
@@ -212,6 +237,32 @@ def get_next_in_queue():
     server.update_row("archive_log", "url", next_video, "status", "Processed",)
     server.close_connection()
     return next_video
+
+@app.route("/api/worker/heartbeat", methods=["POST"])
+def worker_heartbeat():
+    """
+    Endpoint for workers to send a heartbeat
+    """
+    password = request.headers.get('X-AUTHENTICATION')
+    name = request.form.get('name')
+    status = request.form.get('status')
+    print(name, status)
+    server = create_database_connection()
+    try:
+        if not server.check_row_exists("archive_worker_auth", "token", password):
+            abort(401)
+    except:
+        abort(401)
+    
+    if not server.check_row_exists("worker_status", "token", password):
+        server.insert_row("worker_status", "name, token, status, timestamp", (name, password, status, datetime.datetime.now()))
+    else:
+        server.update_row("worker_status", "token", password, "name", name)
+        server.update_row("worker_status", "token", password, "status", status)
+        server.update_row("worker_status", "token", password, "timestamp", datetime.datetime.now())
+    server.close_connection()
+    return "OK", 200
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

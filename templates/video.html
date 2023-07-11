@@ -7,6 +7,7 @@
   <title>{{video_title}} - Patchwork Archive</title>
   <head><meta name="viewport" content="width=device-width">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
+  <script src="{{ url_for('static', filename='scripts/video.js') }}"></script>
   <title>{{video_title}} - Patchwork Archive</title>
   <meta property="og:type" content="website">
   <meta name="title" content="{{video_title}}">
@@ -27,15 +28,13 @@
   <meta property="twitter:description" content="{{channel_name}}">
   <meta property="twitter:image" content="{{ thumbnails_domain }}/{{ video_id }}.jpg">
   <link rel="canonical" href="{{domain}}/watch?v={{video_id}}">
-
 </head>
-
 <body>
   <header>
     <nav>
       <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li> <!-- New element -->
+        <li><a href="/status">Status</a></li> 
       </ul>
     </nav>
     <div id="search-bar">
@@ -71,25 +70,6 @@
           <button id="toggle-description" class="toggle-button" onclick="toggleDescription()">Show More</button>
         </div>
       </div>
-      <script>
-    function toggleDescription() {
-      var description = document.getElementById("description");
-      var toggleButton = document.getElementById("toggle-description");
-
-      if (description.classList.contains("collapsed")) {
-        description.classList.remove("collapsed");
-        toggleButton.innerHTML = "Show Less";
-        description.style.maxHeight = "none"; 
-      } else {
-        description.classList.add("collapsed");
-        toggleButton.innerHTML = "Show More";
-        description.style.maxHeight = "";
-      }
-    }
-    function openInVLC(url) {
-      window.location.href = 'vlc://' + url;
-    }
-      </script>
       <div class="discover">
         <h2>Discover</h2>
         <div class="video-grid">
