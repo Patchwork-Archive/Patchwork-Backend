@@ -12,8 +12,11 @@ A Python Flask server that serves archived videos and metadata from a MySQL data
 ## Getting Started
 ```bash
 git clone https://github.com/pinapelz/Video-Archive-Server.git && cd Video-Archive-Server
+<<<<<<< HEAD
 python -m venv venv
 source venv/bin/activate # or venv\Scripts\activate.bat on Windows
+=======
+>>>>>>> master
 pip install -r requirements.txt
 ```
 Configure `config.ini` according to your needs. Leave `ssh` and `remote_bind` blank if you are not using a remote MySQL server.
@@ -28,8 +31,11 @@ Configure `config.ini` according to your needs. Leave `ssh` and `remote_bind` bl
 
 **Alternatively leaving this field empty and not show storage statistics**
 
+<<<<<<< HEAD
 ### Deploy
 To deploy the server, run `flask_app.py` with the WSIG server of your choice or directly.
+=======
+>>>>>>> master
 
 ---
 
