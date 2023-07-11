@@ -39,6 +39,7 @@ def main():
     server.create_table("archive_queue_auth", "id INTEGER PRIMARY KEY AUTO_INCREMENT, token TEXT")
     server.create_table("archive_worker_auth", "id INTEGER PRIMARY KEY AUTO_INCREMENT, token TEXT")
     server.create_table("archive_log", "id INTEGER PRIMARY KEY AUTO_INCREMENT, url TEXT, user TEXT, status TEXT, timestamp TEXT")
+    server.create_table("worker_status", "id INTEGER PRIMARY KEY AUTO_INCREMENT, name TEXT, token TEXT, status TEXT, timestamp TEXT")
     
     if args.addqueuetoken is not None:
         print("Adding queue token...")
