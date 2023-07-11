@@ -167,6 +167,24 @@ footer h2, footer a {
     padding: 15px;
   }
 
+  #search-bar {
+    display: flex;
+    width: 100%;
+    margin: 0 20px; /* Decreased margin to 20px */
+    flex-grow: 2;
+  }
+
+  #search-bar input[type="text"] {
+    width: 100%; /* Changed width to 100% */
+    padding: 8px; /* Decreased padding to 8px */
+    background-color: #383838;
+    border: none;
+    border-radius: 3px;
+    color: #ffffff;
+    max-width: 400px; /* Decreased max-width to 400px */
+    margin: 0;
+  }
+
   .worker-avatar {
     width: 60px;
     height: 60px;
