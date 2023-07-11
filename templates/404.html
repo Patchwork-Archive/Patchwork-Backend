@@ -4,17 +4,17 @@
   <meta charset="en">
   <meta name="viewport" content="width=device-width", initial-scale="1.0">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/404.css') }}">
-  <title>404 - Patchwork Archives</title>
+  <title>404 - Patchwork Archive</title>
 </head>
 
 <body>
   <header>
-    <div id="logo">
-      <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo">
-    </div>
-    <div id="search-bar">
-      <input type="text" placeholder="Search...">
-    </div>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/status">Status</a></li> 
+      </ul>
+    </nav>
   </header>
   <main>
     <div class="message">

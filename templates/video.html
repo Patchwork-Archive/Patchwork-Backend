@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static',filename='styles/video.css') }}">
-  <title>{{video_title}} - Patchwork Archives</title>
+  <title>{{video_title}} - Patchwork Archive</title>
   <head><meta name="viewport" content="width=device-width">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
-  <title>{{video_title}} - Patchwork Archives</title>
+  <title>{{video_title}} - Patchwork Archive</title>
   <meta property="og:type" content="website">
   <meta name="title" content="{{video_title}}">
-  <meta name="description" content="{{channel_name}}"><meta property="og:site_name" content="Patchwork Archives">
+  <meta name="description" content="{{channel_name}}"><meta property="og:site_name" content="Patchwork Archive">
   <meta property="og:url" content="{{domain}}/watch?v={{video_id}}">
   <meta property="og:title" content="{{video_title}}">
   <meta property="og:description" content="{{channel_name}}">
@@ -35,6 +35,7 @@
     <nav>
       <ul>
         <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li> <!-- New element -->
       </ul>
     </nav>
     <div id="search-bar">

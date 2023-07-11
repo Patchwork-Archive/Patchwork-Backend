@@ -13,7 +13,6 @@ body {
   color: #ffffff;
 }
 
-
 #logo img {
   width: 48px; /* Increased logo size */
   height: 50%;
@@ -31,7 +30,7 @@ header {
 #search-bar {
   display: flex;
   width: 100%;
-  margin: 0 50px; 
+  margin: 0 50px;
   flex-grow: 2;
 }
 
@@ -111,20 +110,6 @@ footer h2, footer a {
   font-family: Arial, sans-serif;
 }
 
-nav ul {
-  display: flex;
-  list-style-type: none;
-}
-
-nav li {
-  margin-right: 10px;
-}
-
-nav a {
-  text-decoration: none;
-  color: #ffffff; /* Text color */
-}
-
 .video-separator {
   border: none;
   border-top: 1px solid #ffffff; /* Color of the line separator */
@@ -159,7 +144,39 @@ nav a {
   margin-bottom: 20px;
 }
 
+nav {
+  display: flex; /* Set the navigation to flex container */
+  justify-content: flex-end; /* Align the items to the right */
+}
 
+nav ul {
+  list-style-type: none;
+  display: flex; /* Display the list items as flex items */
+}
+
+nav li {
+  margin-right: 10px;
+  display: flex; /* Display the list item as a flex item */
+}
+
+nav a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #2A4B71;
+}
+
+nav a:hover {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+li::marker {
+  color: #2A4B71;
+}
 
 @media screen and (max-width: 600px) {
   .video {
@@ -172,7 +189,7 @@ nav a {
     margin: 0 20px; /* Decreased margin to 20px */
     flex-grow: 2;
   }
-  
+
   #search-bar input[type="text"] {
     width: 100%; /* Changed width to 100% */
     padding: 8px; /* Decreased padding to 8px */
@@ -199,18 +216,28 @@ nav a {
   #logo img {
     display: none;
   }
+  
+  nav ul li{
+    display: inline-block;
+    margin-right: 0; /* Remove margin-right */
+    margin-bottom: 10px; /* Add margin-bottom for spacing */
+  }
+  
+  nav ul li a{
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px; /* Decrease font-size for smaller screens */
+    padding: 8px; /* Decrease padding for smaller screens */
+    border-radius: 3px;
+    background-color: #2A4B71;
+    display: block; /* Make the link a block element */
+    margin-bottom: 10px; /* Add margin-bottom for spacing */
+  }
 
-  nav ul {
-    list-style-type: none;
-    margin-bottom: 20px;
-  }
-  
-  nav li {
-    margin-right: 0px;
-  }
-  
-  nav a {
-    padding: 5px;
-    font-size: 14px;
+
+  #button {
+    margin-left: auto;
+    margin-right: 20px; /* Adjust margin as needed */
   }
 }

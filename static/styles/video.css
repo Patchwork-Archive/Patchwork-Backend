@@ -5,13 +5,24 @@ body, h1, h2, h3, p, ul, li {
     font-family: Arial, sans-serif;
   }
 
-  nav ul li:first-child {
-    margin-right: auto;
+  nav {
+    display: flex; /* Set the navigation to flex container */
+    justify-content: flex-end; /* Align the items to the right */
   }
-
-  nav ul li:first-child a {
-    color: #ffffff;
+  
+  nav ul {
+    list-style-type: none;
+    display: flex; /* Display the list items as flex items */
+  }
+  
+  nav li {
+    margin-right: 10px;
+    display: flex; /* Display the list item as a flex item */
+  }
+  
+  nav a {
     text-decoration: none;
+    color: #ffffff;
     font-weight: bold;
     font-size: 18px;
     padding: 10px;
@@ -19,11 +30,11 @@ body, h1, h2, h3, p, ul, li {
     background-color: #2A4B71;
   }
   
-  nav ul li:first-child a:hover {
+  nav a:hover {
     background-color: #ffffff;
     color: #000000;
   }
-
+  
   li::marker {
     color: #2A4B71;
   }
@@ -188,12 +199,13 @@ body, h1, h2, h3, p, ul, li {
       align-items: flex-start;
     }
 
-    nav ul li:first-child {
+    nav ul li{
+      display: inline-block;
       margin-right: 0; /* Remove margin-right */
       margin-bottom: 10px; /* Add margin-bottom for spacing */
     }
     
-    nav ul li:first-child a {
+    nav ul li a{
       color: #ffffff;
       text-decoration: none;
       font-weight: bold;
