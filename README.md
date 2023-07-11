@@ -17,6 +17,7 @@ source venv/bin/activate # or venv\Scripts\activate.bat on Windows
 pip install -r requirements.txt
 ```
 Configure `config.ini` according to your needs. Leave `ssh` and `remote_bind` blank if you are not using a remote MySQL server.
+Configure `site_config.json` according to the domain of where your server is serving to (such as http://localhost:5000) along with the base url of where your thumbnails and videos are being served from
 
 `accountId` and `api_token` are authetication fields for the storage usage statistics on the dashboard. The code in the repo is configured to use Cloudflare R2 storage and as such calls the Cloudflare API to get the storage usage statistics
 
@@ -28,8 +29,26 @@ Configure `config.ini` according to your needs. Leave `ssh` and `remote_bind` bl
 
 **Alternatively leaving this field empty and not show storage statistics**
 
+### Using the queue
+To add videos to the queue send a POST request to the `/api/worker/queue` endpoint
+```bash
+curl -X POST -H "X-AUTHENTICATION: YOUR_QUEUE_TOKEN" -d "url=VIDEO_URL" http://localhost:5000/api/worker/queue
+```
+
+To read from the queue send a GET request to the `/api/worker/next` endpoint
+```bash
+curl -X GET -H "X-AUTHENTICATION: YOUR_WORKER_TOKEN" http://localhost:5000/api/worker/next
+```
+
 ### Deploy
-To deploy the server, run `flask_app.py` with the WSIG server of your choice or directly.
+To deploy the server first run create the database and tables along with tokens for a worker and queuer if necessary
+```bash
+python dbm.py --addqueuetoken "THE_QUEUE_TOKEN_YOU_WANT_TO_USE" --addworkertoken "THE_WORKER_TOKEN_YOU_WANT_TO_USE"
+```
+Adding to the queue requires the queue token and similarly reading from the queue requires the worker token
+
+Then run `flask_app.py` with the WSIG server of your choice or directly.
+
 
 ---
 
