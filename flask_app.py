@@ -64,7 +64,12 @@ def landing_page():
     featured_data = server.get_query_result(featured_query)
     featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
     server.close_connection()
-    number_of_files = int(storage_api.get_number_of_files())
+    try:
+        number_of_files = int(storage_api.get_number_of_files())
+        storage_size = str(round(int(storage_api.get_storage_used())/ (1024 **3), 2))
+    except:
+        number_of_files = "some number"
+        storage_size = "a lot"
     return render_template("landing.html", 
                             videos=videos,
                             domain=SITE_CONFIG["domain"],
@@ -72,7 +77,7 @@ def landing_page():
                             recent_archived_videos=recent_archived_videos,
                             featured_videos=featured_videos,
                             archived_videos_count=f"{number_of_files:,}" if number_of_files >= 10000 else str(number_of_files), #　Pretty print the number of files
-                            archive_size=str(round(int(storage_api.get_storage_used())/ (1024 **3), 2)),
+                            archive_size=storage_size,
                            )
 
 @app.route("/watch")
