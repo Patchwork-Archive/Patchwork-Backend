@@ -93,11 +93,11 @@ class SQLHandler:
         except Error as err:
             print(err)
 
-    def insert_row(self, name: str, column: str, data: tuple):
+    def insert_row(self, table_name: str, column: str, data: tuple):
         cursor = self.connection.cursor(buffered=True)
         try:
             placeholders = ', '.join(['%s'] * len(data))
-            query = f"INSERT INTO {name} ({column}) VALUES ({placeholders})"
+            query = f"INSERT INTO {table_name} ({column}) VALUES ({placeholders})"
             cursor.execute(query, data)
             self.connection.commit()
             print("Data Inserted:", data)

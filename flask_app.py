@@ -10,16 +10,12 @@ import re
 app = Flask(__name__)
 CORS(app)
 
-QUEUE_PASSWORD = "change_me"
-WORKER_PASSWORD = "worker_password"
-
 if fileutil.check_file_exists("config.ini"):
     CONFIG = fileutil.read_config("config.ini")
     SITE_CONFIG = fileutil.read_site_config("site_config.json")
 else:
     CONFIG = fileutil.read_config("/home/pinapelz/cover_viewer/config.ini")
     SITE_CONFIG = fileutil.read_site_config("/home/pinapelz/cover_viewer/site_config.json")
-
 
 
 def create_database_connection():
@@ -162,17 +158,21 @@ def archive_url():
     Endpoint for queueing a video to workers
     """
     password = request.headers.get('X-AUTHENTICATION')
-    if password != QUEUE_PASSWORD:
+    if password is None:
         abort(401)
-
+    server = create_database_connection()
+    try:
+        if not server.check_row_exists("archive_queue_auth", "token", password):
+            abort(401)
+    except:
+        abort(401)
     url = request.form.get('url')
     if request.method == "POST":
-        server = create_database_connection()
-        server.create_table("archive_queue", "id INTEGER PRIMARY KEY AUTO_INCREMENT, url TEXT")
         if server.check_row_exists("archive_queue", "url", url):
             server.close_connection()
             return "Already queued"
         server.insert_row("archive_queue", "url", (url,))
+        server.insert_row("archive_log", "url, user, status, timestamp", (url, password, "Queued", datetime.datetime.now()))
         server.close_connection()
         return "OK"
 
@@ -198,11 +198,18 @@ def get_next_in_queue():
     Endpoint for workers to get the next video in the queue
     """
     password = request.args.get('password')
-    if password != WORKER_PASSWORD:
+    server = create_database_connection()
+    try:
+        if not server.check_row_exists("archive_worker_auth", "token", password):
+            abort(401)
+    except:
         abort(401)
     next_video = get_next_video_in_queue()
     if next_video is None:
+        server.close_connection()
         return "No videos in queue", 204
+    server.update_row("archive_log", "url", next_video, "status", "Processed",)
+    server.close_connection()
     return next_video
 
 if __name__ == "__main__":
