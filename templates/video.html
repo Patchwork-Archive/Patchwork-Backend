@@ -50,14 +50,13 @@
   <main>
     <div class="content">
       <div class="video">
-        <video 
-        src="{{cdn}}/{{ video_id }}.webm" 
-        poster="{{ thumbnails_domain }}/{{ video_id }}.jpg"
-        controls
-        autoplay
-        playsinline
-        >
+        <video controls autoplay playsinline poster="{{ thumbnails_domain }}/{{ video_id }}.jpg">
+          <source src="{{cdn}}/{{ video_id }}.webm" type="video/webm">
+          <source src="{{cdn}}/{{ video_id }}.mp4" type="video/mp4">
+          Your browser cannot play this video
         </video>
+      </div>
+      
         <div class="details">
           <h3>{{video_title}}</h3>
           <p>{{channel_name}}</p>
