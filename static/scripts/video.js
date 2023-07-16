@@ -16,3 +16,26 @@ function toggleDescription() {
 function openInVLC(url) {
     window.location.href = 'vlc://' + url;
 }
+
+function getInfoJSON(cdn_url) {
+  var request = new XMLHttpRequest();
+  request.open('GET', cdn_url + '.info.json', true);
+  request.onload = function () {
+    if (request.status >= 200 && request.status < 400) {
+      var data = JSON.parse(request.responseText);
+
+      var title = document.getElementById("title");
+      title.innerHTML = data.title;
+
+      var description = document.getElementById("description");
+      description.innerHTML = data.description;
+
+    } else {
+      console.log("Error: " + request.status);
+    }
+  };
+  request.onerror = function () {
+    console.log("Error: " + request.status);
+  };
+  request.send();
+}

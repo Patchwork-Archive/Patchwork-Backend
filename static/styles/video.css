@@ -162,6 +162,7 @@ body, h1, h2, h3, p, ul, li {
   .description-content {
     max-height: 100px; /* Initial maximum height to show only a portion of the description */
     overflow: hidden;
+    white-space: pre-line;
     transition: max-height 0.3s ease; /* Smooth transition when expanding or collapsing */
   }
 

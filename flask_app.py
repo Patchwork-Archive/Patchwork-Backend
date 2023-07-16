@@ -96,6 +96,7 @@ def watch_video():
                                 domain=SITE_CONFIG["domain"],
                                 cdn=SITE_CONFIG["cdn"],
                                 thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
+                                metadata_domain=SITE_CONFIG["metadata_domain"],
                                 video_title = video_data[0][1],
                                 channel_name = video_data[0][2],
                                 upload_date = video_data[0][4],

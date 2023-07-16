@@ -59,7 +59,7 @@
         >
         </video>
         <div class="details">
-          <h3>{{video_title}}</h3>
+          <h3 id="title">{{video_title}}</h3>
           <p>{{channel_name}}</p>
           <p>{{upload_date}}</p>
           <button id="open-vlc-button" onclick="openInVLC('{{cdn}}/{{ video_id }}.webm')">Open in VLC</button>
@@ -91,4 +91,7 @@
 
   </main>
 </body>
+<script>
+  getInfoJSON("{{metadata_domain}}/{{video_id}}")
+</script>
 </html>

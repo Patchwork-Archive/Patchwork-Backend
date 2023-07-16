@@ -1,5 +1,6 @@
 {
     "domain": "https://archive.pinapelz.moe",
     "cdn": "https://cdn.pinapelz.com/VTuber%20Covers%20Archive",
-    "thumbnails_domain": "https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails"
+    "thumbnails_domain": "https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails",
+    "metadata_domain": "https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/metadata"
 }
