@@ -29,6 +29,9 @@ function getInfoJSON(cdn_url) {
 
       var description = document.getElementById("description");
       description.innerHTML = data.description;
+      
+      var channel_name = document.getElementById("channel-name");
+      channel_name.innerHTML = data.channel_name;
 
     } else {
       console.log("Error: " + request.status);
