@@ -31,7 +31,7 @@ function getInfoJSON(cdn_url) {
       description.innerHTML = data.description;
       
       var channel_name = document.getElementById("channel-name");
-      channel_name.innerHTML = data.channel_name;
+      channel_name.innerHTML = data.uploader;
 
     } else {
       console.log("Error: " + request.status);
