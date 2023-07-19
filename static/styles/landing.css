@@ -64,9 +64,16 @@ h2 {
   margin-bottom: 30px; /* Increased margin-bottom */
 }
 
+.thumbnail {
+  margin-right: 20px;
+  margin-bottom: 0;
+  max-width: 100%;
+  max-height: 75%;
+}
+
 .thumbnail img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   border-radius: 8px;
 }
@@ -120,7 +127,7 @@ footer h2, footer a {
 .video-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 5px;
 }
 
 .message {
