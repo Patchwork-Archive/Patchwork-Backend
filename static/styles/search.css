@@ -68,7 +68,7 @@ header {
 }
 
 .search-result .thumbnail {
-  width: 23%;
+  width: 316px;
   padding-right: 30px;
   height: auto;
   object-fit: cover;
