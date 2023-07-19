@@ -51,7 +51,7 @@ body {
 
 header {
   background-color: #2a4b71;
-  padding: 10px;
+  padding: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -253,6 +253,7 @@ main {
   .video {
     margin-right: 0;
     height: 100%;
+    width: 80%;
     object-fit: cover;
   }
 
