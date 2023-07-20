@@ -152,7 +152,7 @@ main {
 }
 
 .video-grid .video img {
-  height: 160px;
+  width: 316px;
   object-fit: cover;
 }
 
