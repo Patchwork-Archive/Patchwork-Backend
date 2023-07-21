@@ -128,6 +128,32 @@ li::marker {
   color: #2A4B71;
 }
 
+.pagination, .pagination-bottom {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.pagination button, .pagination-bottom button {
+  padding: 10px 20px;
+  background-color: #2A4B71;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination button:hover, .pagination-bottom button:hover {
+  background-color: #2A4B71;
+}
+
+.pagination button:disabled, .pagination-bottom button:disabled {
+  background-color: #c0c0c0;
+  cursor: not-allowed;
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
   header {

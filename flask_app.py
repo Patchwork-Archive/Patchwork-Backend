@@ -109,7 +109,9 @@ def watch_video():
 def search_query():
     server = create_database_connection()
     search_terms = request.args.get('search_query')
-    data = server.search_video_row("songs", search_terms.split(), 14)
+    page = request.args.get('page') if request.args.get('page') is not None else 1
+    start_range = int(SITE_CONFIG["search_results_per_page"]) * (int(page) - 1)
+    data = server.search_video_row("songs", search_terms.split(), int(SITE_CONFIG["search_results_per_page"]), start_range)
     server.close_connection()
     search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     return render_template("search.html", 

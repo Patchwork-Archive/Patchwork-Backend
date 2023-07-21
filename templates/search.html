@@ -8,7 +8,7 @@
   <meta property="og:title" content="{{search_terms}} -  Patchwork Archive">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
 </head>
-
+<script src="{{ url_for('static', filename='scripts/search.js') }}"></script>
 <body>
   <header>
     <nav>
@@ -26,6 +26,10 @@
       <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo">
     </div>
   </header>
+  <div class="pagination">
+    <button id="last-page">Last Page</button>
+    <button id="next-page">Next Page</button>
+  </div>
   <div class="search-results">
     {% for video in search_result %}
     <a href="/watch?v={{ video['video_id'] }}" class="search-result">
@@ -38,6 +42,24 @@
     </a>
     {% endfor %}
   </div>
+  <div class="pagination-bottom">
+    <button id="last-page-bottom">Last Page</button>
+    <button id="next-page-bottom">Next Page</button>
+  </div>
+  <script>
+  document.getElementById("last-page").addEventListener("click", function () {
+    addPageParam(-1); 
+  });
+  document.getElementById("next-page").addEventListener("click", function () {
+    addPageParam(1); 
+  }); 
+  document.getElementById("last-page-bottom").addEventListener("click", function () {
+    addPageParam(-1); 
+  });
+  document.getElementById("next-page-bottom").addEventListener("click", function () {
+    addPageParam(1); 
+  }); 
+  </script>
 </body>
 
 </html>

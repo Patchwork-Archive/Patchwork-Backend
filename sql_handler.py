@@ -231,14 +231,17 @@ class SQLHandler:
             print("Error getting random row")
             print(err)
     
-    def search_video_row(self, table_name: str, keywords: list, limit: int = 1, start: int = 1, offset: int = 0):
+    def search_video_row(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} WHERE 1=1"
         for keyword in keywords:
-            query += f" AND LOWER(title) LIKE '%{keyword.lower()}%'"
-        query += f" LIMIT {str(limit)} OFFSET {str(start - offset)}"
+            query += f" AND LOWER(title) LIKE %s"
+            keyword = f"%{keyword.lower()}%"
+        
+        query += " LIMIT %s OFFSET %s"
+
         try:
-            cursor.execute(query)
+            cursor.execute(query, (keyword, limit, offset))
             result = cursor.fetchall()
             return result
         except Error as err:
