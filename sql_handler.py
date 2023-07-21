@@ -234,18 +234,24 @@ class SQLHandler:
     def search_video_row(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} WHERE 1=1"
+        keyword_conditions = [] 
+
         for keyword in keywords:
-            query += f" AND LOWER(title) LIKE %s"
-            keyword = f"%{keyword.lower()}%"
-        
+            keyword_condition = f"LOWER(title) LIKE %s"
+            formatted_keyword = f"%{keyword.lower()}%"  
+            keyword_conditions.append((keyword_condition, formatted_keyword))  
+        if keyword_conditions:
+            query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
+
         query += " LIMIT %s OFFSET %s"
 
         try:
-            cursor.execute(query, (keyword, limit, offset))
+            cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
             result = cursor.fetchall()
             return result
         except Error as err:
             print("Error searching video row")
             print(err)
+
 
 
