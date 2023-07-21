@@ -31,5 +31,5 @@ function addPageParam(offset) {
     window.history.pushState({ path: newURL }, "", newURL);
     location.reload();
     window.scrollTo(0, 0);
-  }
+}
   

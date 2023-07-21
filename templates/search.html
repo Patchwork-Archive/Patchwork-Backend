@@ -1,66 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static',filename='styles/search.css') }}">
-  <title>{{search_terms}} -  Patchwork Archive</title>
-  <meta property="og:title" content="{{search_terms}} -  Patchwork Archive">
-  <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
-</head>
-<script src="{{ url_for('static', filename='scripts/search.js') }}"></script>
-<body>
-  <header>
-    <nav>
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/status">Status</a></li> 
-      </ul>
-    </nav>
-    <div id="search-bar">
-      <form action="/results" method="GET">
-        <input type="text" name="search_query" placeholder="Search" value="{{search_terms}}">
-      </form>
-    </div>
-    <div id="logo">
-      <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo">
-    </div>
-  </header>
-  <div class="pagination">
-    <button id="last-page">Last Page</button>
-    <button id="next-page">Next Page</button>
-  </div>
-  <div class="search-results">
-    {% for video in search_result %}
-    <a href="/watch?v={{ video['video_id'] }}" class="search-result">
-      <img class="thumbnail" src="{{ thumbnails_domain }}/{{ video['video_id'] }}.jpg" alt="Thumbnail">
-      <div class="details">
-        <h3 class="title">{{ video['title'] }}</h3>
-        <p class="channel">{{ video['channel_name'] }}</p>
-        <p class="date">{{ video['upload_date'] }}</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/search.css') }}"
+    />
+    <title>{{search_terms}} - Patchwork Archive</title>
+    <meta property="og:title" content="{{search_terms}} -  Patchwork Archive" />
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='img/logo.png') }}"
+      type="image/png"
+    />
+  </head>
+  <script src="{{ url_for('static', filename='scripts/search.js') }}"></script>
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/status">Status</a></li>
+        </ul>
+      </nav>
+      <div id="search-bar">
+        <form action="/results" method="GET">
+          <input
+            type="text"
+            name="search_query"
+            placeholder="Search"
+            value="{{search_terms}}"
+          />
+        </form>
       </div>
-    </a>
-    {% endfor %}
-  </div>
-  <div class="pagination-bottom">
-    <button id="last-page-bottom">Last Page</button>
-    <button id="next-page-bottom">Next Page</button>
-  </div>
-  <script>
-  document.getElementById("last-page").addEventListener("click", function () {
-    addPageParam(-1); 
-  });
-  document.getElementById("next-page").addEventListener("click", function () {
-    addPageParam(1); 
-  }); 
-  document.getElementById("last-page-bottom").addEventListener("click", function () {
-    addPageParam(-1); 
-  });
-  document.getElementById("next-page-bottom").addEventListener("click", function () {
-    addPageParam(1); 
-  }); 
-  </script>
-</body>
-
+      <div id="logo">
+        <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo" />
+      </div>
+    </header>
+      <div class="pagination">
+        <button id="last-page">Last Page</button>
+        <button id="next-page">Next Page</button>
+      </div>
+      <div class="search-results">
+        {% for video in search_result %}
+        <a href="/watch?v={{ video['video_id'] }}" class="search-result">
+          <img
+            class="thumbnail"
+            src="{{ thumbnails_domain }}/{{ video['video_id'] }}.jpg"
+            alt="Thumbnail"
+          />
+          <div class="details">
+            <h3 class="title">{{ video['title'] }}</h3>
+            <p class="channel">{{ video['channel_name'] }}</p>
+            <p class="date">{{ video['upload_date'] }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      <div class="pagination-bottom">
+        <button id="last-page-bottom">Last Page</button>
+        <button id="next-page-bottom">Next Page</button>
+      </div>
+      <script>
+        document
+          .getElementById("last-page")
+          .addEventListener("click", function () {
+            addPageParam(-1);
+          });
+        document
+          .getElementById("next-page")
+          .addEventListener("click", function () {
+            addPageParam(1);
+          });
+        document
+          .getElementById("last-page-bottom")
+          .addEventListener("click", function () {
+            addPageParam(-1);
+          });
+        document
+          .getElementById("next-page-bottom")
+          .addEventListener("click", function () {
+            addPageParam(1);
+          });
+      </script>
+  </body>
 </html>

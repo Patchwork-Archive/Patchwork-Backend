@@ -114,6 +114,8 @@ def search_query():
     data = server.search_video_row("songs", search_terms.split(), int(SITE_CONFIG["search_results_per_page"]), start_range)
     server.close_connection()
     search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
+    if len(search_result) == 0:
+        return render_template("search_no_result.html", search_terms=search_terms)
     return render_template("search.html", 
                            search_result=search_result,
                            search_terms = search_terms,
