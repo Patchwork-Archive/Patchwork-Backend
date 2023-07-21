@@ -39,14 +39,28 @@
       </div>
     </header>
     <style>
-        h1 {
-            text-align: center;
-            font-size: 2rem;
-            margin-top: 2rem;
-        }
+      h1 {
+        text-align: center;
+        font-size: 2rem;
+        margin-top: 2rem;
+      }
     </style>
-    <h1>
-        No results found for "{{search_terms}}". Try searching for something else.
-    </h1>
+    <h1>No results found this page! :(</h1>
+    <div class="pagination-bottom">
+      <button id="last-page-bottom">Last Page</button>
+      <button id="next-page-bottom">Next Page</button>
+    </div>
+    <script>
+      document
+        .getElementById("last-page-bottom")
+        .addEventListener("click", function () {
+          addPageParam(-1);
+        });
+      document
+        .getElementById("next-page-bottom")
+        .addEventListener("click", function () {
+          addPageParam(1);
+        });
+    </script>
   </body>
 </html>
