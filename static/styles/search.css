@@ -72,7 +72,6 @@ header {
   padding-right: 30px;
   height: auto;
   object-fit: cover;
-  border-radius: 8px;
 }
 
 .search-result .details {
