@@ -1,39 +1,4 @@
-.video-player {
-    position: relative;
-  }
-  
-  .custom-control-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #333;
-    padding: 10px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-  }
-  
-  .control-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    color: white;
-    margin: 0 10px;
-  }
-  
-  .volume-slider {
-    width: 100px;
-    margin: 0 10px;
-  }
-  
-  /* Hide the pause icon by default */
-  #pause-icon {
-    display: none;
-  }
-  
-  /* Reset default browser styles */
+
 body,
 h1,
 h2,
@@ -47,18 +12,18 @@ li {
 }
 
 nav {
-  display: flex; /* Set the navigation to flex container */
-  justify-content: flex-end; /* Align the items to the right */
+  display: flex; 
+  justify-content: flex-end;
 }
 
 nav ul {
   list-style-type: none;
-  display: flex; /* Display the list items as flex items */
+  display: flex; 
 }
 
 nav li {
   margin-right: 10px;
-  display: flex; /* Display the list item as a flex item */
+  display: flex;
 }
 
 nav a {
@@ -93,7 +58,7 @@ header {
 }
 
 #logo img {
-  width: 48px; /* Increased logo size */
+  width: 48px;
   height: 50%;
   margin-right: 10px;
 }
@@ -112,7 +77,7 @@ header {
   border: none;
   border-radius: 3px;
   color: #ffffff;
-  max-width: 800px; /* Increased width to 800px */
+  max-width: 800px;
   margin: 0;
 }
 
@@ -145,19 +110,25 @@ main {
 
 .details {
   margin-bottom: 15px;
+  text-align: center;
 }
 
 .details h3 {
   font-size: 24px; /* Increased font size */
   font-weight: bold;
-  margin-bottom: 10px; /* Increased margin-bottom */
+  margin-bottom: 10px; 
   color: #ffffff;
 }
-.details h2 {
+.details h2, 
+.video-bar .watched-videos-count,
+.video-progress-text
+{
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 10px;
   color: #ffffff;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .details p {
@@ -196,7 +167,7 @@ main {
 }
 
 .video-grid .details h3 {
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 5px;
   color: #ffffff;
 }
@@ -207,10 +178,10 @@ main {
 }
 
 .description-content {
-  max-height: 100px; /* Initial maximum height to show only a portion of the description */
+  max-height: 100px; 
   overflow: hidden;
   white-space: pre-line;
-  transition: max-height 0.3s ease; /* Smooth transition when expanding or collapsing */
+  transition: max-height 0.3s ease;
 }
 
 .collapsed {
@@ -225,19 +196,34 @@ main {
   text-decoration: underline;
 }
 
-#skip-button {
+#skip-button,
+#pause-button {
   padding: 10px 20px;
   background-color: #2a4b71;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 10px;
 }
 
-#skip-button:hover {
-  background-color: #2a4b71;
+.video-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
 }
+
+.watched-videos-count {
+  font-size: 14px;
+}
+
+
+#volume-slider {
+  width: 100px;
+  margin-left: 10px;
+}
+
 
 @media (max-width: 768px) {
   header {
@@ -247,37 +233,37 @@ main {
 
   nav ul li {
     display: inline-block;
-    margin-right: 0; /* Remove margin-right */
-    margin-bottom: 10px; /* Add margin-bottom for spacing */
+    margin-right: 0;
+    margin-bottom: 10px;
   }
 
   nav ul li a {
     color: #ffffff;
     text-decoration: none;
     font-weight: bold;
-    font-size: 16px; /* Decrease font-size for smaller screens */
-    padding: 8px; /* Decrease padding for smaller screens */
+    font-size: 16px; 
+    padding: 8px; 
     border-radius: 3px;
     background-color: #2a4b71;
-    display: block; /* Make the link a block element */
-    margin-bottom: 10px; /* Add margin-bottom for spacing */
+    display: block;
+    margin-bottom: 10px;
   }
 
   #search-bar {
     display: flex;
     width: 100%;
-    margin: 0 20px; /* Decreased margin to 20px */
+    margin: 0 20px; 
     flex-grow: 2;
   }
 
   #search-bar input[type="text"] {
-    width: 100%; /* Changed width to 100% */
-    padding: 8px; /* Decreased padding to 8px */
+    width: 100%; 
+    padding: 8px; 
     background-color: #383838;
     border: none;
     border-radius: 3px;
     color: #ffffff;
-    max-width: 400px; /* Decreased max-width to 400px */
+    max-width: 400px; 
     margin: 0;
   }
 
@@ -292,31 +278,22 @@ main {
     object-fit: cover;
   }
 
-  #skip-button {
-    font-size: 14px;
+  .video-bar {
+    flex-direction: column; 
+    align-items: center; 
   }
 
-  .discover {
-    margin-bottom: 20px;
+  #skip-button,
+  #pause-button {
+    padding: 8px 16px;
+    font-size: 14px; 
+    margin-bottom: 10px;
   }
 
-  .video-grid .video {
-    flex-direction: column;
-    align-items: center;
-  }
-  .video-grid .details h3 {
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #ffffff;
+  #volume-slider {
+    width: 150px;
+    margin-left: 0;
   }
 
-  .video-grid .details p {
-    color: #888888;
-    margin-bottom: 5px;
-  }
 
-  .video-grid .video img {
-    width: 316px;
-    object-fit: cover;
-  }
 }

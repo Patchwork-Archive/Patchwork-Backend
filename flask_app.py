@@ -41,10 +41,10 @@ def pick_featured_videos(max_videos: int):
     n2 = random.randint(1, max_videos)
     return n1, n2
 
-@app.route("/random")
+@app.route("/radio")
 def random_video_player():
     return render_template(
-        "random_video.html",
+        "radio.html",
         domain=SITE_CONFIG["domain"],
         cdn=SITE_CONFIG["cdn"],
         thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
