@@ -1,183 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>Random Video Player</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .container {
-      width: 100%;
-      max-width: 1300px; /* Increased width */
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .video-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #000;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
-      position: relative;
-      margin-bottom: 20px;
-    }
-    
-    .video-wrapper video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .video-info {
-      background-color: #f9f9f9;
-      padding: 20px;
-      border-radius: 5px;
-    }
-    
-    .video-info h2 {
-      margin: 0;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-    
-    .video-info p {
-      margin: 5px 0;
-    }
-    
-    .video-info .description {
-      display: none;
-      margin-top: 10px;
-    }
-    
-    .video-info .expand-button {
-      display: block;
-      text-align: center;
-      margin-top: 10px;
-      cursor: pointer;
-      color: #06c;
-    }
-    
-    .footer {
-      text-align: center;
-      margin-top: 50px;
-      font-size: 14px;
-      color: #999;
-    }
-    
-    .skip-button {
-      display: block;
-      width: 100%;
-      max-width: 200px;
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #f44336;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      border-radius: 5px;
-      text-align: center;
-      text-decoration: none;
-    }
-  </style>
-</head>
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/video.css') }}">
+  <title>{{video_title}} - Patchwork Archive</title>
+
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
+    <title>Patchwork Archive - Random</title>
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="{{domain}}/watch?v={{video_id}}">
+  </head>
+
 <body>
-  <div class="container">
-    <div class="video-wrapper">
-      <video controls autoplay></video>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/status">Status</a></li>
+      </ul>
+    </nav>
+    <div id="search-bar">
+      <form action="/results" method="GET">
+        <input type="text" name="search_query" placeholder="Search">
+      </form>
     </div>
-    
-    <div class="video-info">
-      <p id="ios-warning"></p>
-      <h2 id="title"></h2>
-      <p id="channelName"></p>
-      <p id="uploadDate"></p>
-      <div class="description" id="description"></div>
-      <button class="skip-button" id="skipButton">Skip</button>
-      <div class="expand-button" id="expandButton">Expand</div>
-      <p id="share-url"></p>
+    <div id="logo">
+      <img src="{{url_for('static', filename='img/logo.png')}}" alt="Logo">
     </div>
-    
-    <div class="footer">
-      We are under construction
+  </header>
+
+  <main>
+    <div class="content">
+      <div class="video">
+        <video 
+        src="{{cdn}}/{{video_id}}.webm" 
+        poster="{{thumbnails_domain}}/{{video_id}}.jpg" 
+        controls 
+        autoplay
+        onended="fetchAndDisplayRandomVideo('/api/random_video')"
+        playsinline>
+        </video>
+      </div>
+        <div class="details">
+          <h3 id="title"></h3>
+          <p id="channel_name"></p>
+          <p id="upload_date"></p>
+          <button id="open-vlc-button" onclick="openInVLC('{{cdn}}/{{video_id}}.webm')">Open in VLC</button>
+          <br>
+          <br>
+          <h2>Description</h2>
+          <p id="description" class="description-content collapsed"></p>
+          <button id="toggle-description" class="toggle-button" onclick="toggleDescription()">Show More</button>
+        </div>
     </div>
-  </div>
-  
+  </main>
   <script>
-    function loadRandomVideo() {
-      console.log("Loading random video...");
-      fetch("{{domain}}/api/random_video")
+    fetchAndDisplayRandomVideo('/api/random_video');
+    function fetchAndDisplayRandomVideo(api_url) {
+      const videoElement = document.querySelector('video');
+      const titleElement = document.getElementById('title');
+      const channelNameElement = document.getElementById('channel_name');
+      const uploadDateElement = document.getElementById('upload_date');
+      const descriptionElement = document.getElementById('description');
+      const openVlcButton = document.getElementById('open-vlc-button');
+      fetch(api_url)
         .then(response => response.json())
         .then(data => {
-          // Extract the video URL from the response data
-          const videoUrl = "{{cdn}}/" + data.video_id + ".webm";
-          
-          // Create a video element to embed the video
-          const videoPlayer = document.querySelector(".video-wrapper video");
-          const thumbnailUrl = "{{thumbnails_domain}}/"+data.video_id+".jpg";
-          videoPlayer.setAttribute("poster", thumbnailUrl);
-          videoPlayer.setAttribute("src", videoUrl);
-
-          // Add event listener for video end
-          videoPlayer.addEventListener("ended", loadRandomVideo);
-          document.getElementById("title").textContent = data.title;
-          const iosWarningElement = document.getElementById("ios-warning");
-          iosWarningElement.innerHTML = "iOS please watch through the VLC Player App or another app that supports WEBM format " +
-            "<a href='vlc://" + videoUrl + "'>" + "Tap Here!" + "</a>";
-
-          document.getElementById("channelName").textContent = "Channel: " + data.channel_name;
-          document.getElementById("uploadDate").textContent = "Uploaded on: " + data.upload_date;
-          document.getElementById("share-url").innerHTML =
-            "Share this video: <a href='{{domain}}/watch?v=" +
-            data.video_id +
-            "'>{{domain}}/watch?v=" +
-            data.video_id +
-            "</a>";
-
-          const descriptionElement = document.getElementById("description");
-          descriptionElement.innerHTML = data.description.replace(/\\n|\n/g, "<br>");
-          descriptionElement.style.display = "none"; // Hide the full description initially
+          const videoId = data.video_id;
+          videoElement.src = `{{cdn}}/${videoId}.webm`;
+          videoElement.poster = `{{thumbnailsDomain}}/${videoId}.jpg`;
+          titleElement.textContent = data.title;
+          channelNameElement.textContent = data.channel_name;
+          uploadDateElement.textContent = data.upload_date;
+          descriptionElement.textContent = data.description;
+          openVlcButton.onclick = function () {
+            openInVLC(`${cdn}/${videoId}.webm`);
+          };
         })
         .catch(error => {
-          console.log("An error occurred while loading the video:", error);
+          console.error('Error fetching data:', error);
         });
+        videoElement.play();
     }
-    
-    // Function to toggle the visibility of the full description
-    function toggleDescription() {
-      const descriptionElement = document.getElementById("description");
-      const expandButton = document.getElementById("expandButton");
-      
-      if (descriptionElement.style.display === "none") {
-        descriptionElement.style.display = "block";
-        expandButton.textContent = "Shrink";
-      } else {
-        descriptionElement.style.display = "none";
-        expandButton.textContent = "Expand";
-      }
-    }
-    
-    // Function to skip to the next random video
-    function skipVideo() {
-      loadRandomVideo();
-    }
-    
-    // Load a random video when the page loads
-    window.addEventListener("load", function() {
-      loadRandomVideo();
-    });
-    
-    document.getElementById("skipButton").addEventListener("click", skipVideo);
-    document.getElementById("expandButton").addEventListener("click", toggleDescription);
   </script>
 </body>
 </html>
