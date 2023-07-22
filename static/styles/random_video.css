@@ -225,7 +225,7 @@ main {
   text-decoration: underline;
 }
 
-#open-vlc-button {
+#skip-button {
   padding: 10px 20px;
   background-color: #2a4b71;
   color: white;
@@ -235,7 +235,7 @@ main {
   margin-top: 10px;
 }
 
-#open-vlc-button:hover {
+#skip-button:hover {
   background-color: #2a4b71;
 }
 
@@ -292,7 +292,7 @@ main {
     object-fit: cover;
   }
 
-  #open-vlc-button {
+  #skip-button {
     font-size: 14px;
   }
 
