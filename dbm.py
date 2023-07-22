@@ -1,8 +1,8 @@
 """
 Database Manager Module to be executed seperately for adding and removing auth tokens
 """
-from sql_handler import SQLHandler
-import fileutil
+from database.sql_handler import SQLHandler
+import utils.fileutil as fileutil
 import argparse
 
 if fileutil.check_file_exists("config.ini"):

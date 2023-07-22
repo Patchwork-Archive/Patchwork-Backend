@@ -1,14 +1,15 @@
 from flask import Flask, render_template, request, jsonify, abort
-import fileutil
-from sql_handler import SQLHandler
+from database.sql_handler import SQLHandler
 from flask_cors import CORS
 from webapi.cloudflare import CloudflareAPI
 import random
 import datetime
 import re
+import utils.fileutil as fileutil
 
 app = Flask(__name__)
 CORS(app)
+current_radio_data = None
 
 if fileutil.check_file_exists("config.ini"):
     CONFIG = fileutil.read_config("config.ini")
