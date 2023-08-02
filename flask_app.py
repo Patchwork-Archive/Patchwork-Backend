@@ -274,6 +274,18 @@ def worker_heartbeat():
     server.close_connection()
     return "OK", 200
 
+@app.route("/api/database/status", methods=["GET"])
+def get_database_status():
+    """
+    Endpoint for workers to get the database status
+    """
+    try:
+        server = create_database_connection()
+        server.close_connection()
+        return "OK", 200
+    except Exception as e:
+        return abort(500)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
