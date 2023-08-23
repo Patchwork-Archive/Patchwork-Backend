@@ -127,7 +127,7 @@ def search_query():
 @app.route("/channel/<channel_id>")
 def channel_page(channel_id):
     server = create_database_connection()
-    page_number = request.args.get('page') if request.args.get('page') is not None else 1
+    page_number = request.args.get('page') if request.args.get('page') is not None else 0
     start_range = int(page_number) * 9
     end_range = start_range + 9
     # data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {str(int(page_number) * 15)}")
