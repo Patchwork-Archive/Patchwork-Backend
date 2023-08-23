@@ -66,7 +66,7 @@ def landing_page():
     featured_data = server.get_query_result(featured_query)
     featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
     try:
-        number_of_files = int(storage_api.get_number_of_files())
+        number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
         storage_size = str(round(int(storage_api.get_storage_used())/ (1024 **3), 2))
     except:
         number_of_files = "some number"
