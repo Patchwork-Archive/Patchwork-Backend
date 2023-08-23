@@ -102,6 +102,7 @@ def watch_video():
                                 video_title = video_data[0][1],
                                 channel_name = video_data[0][2],
                                 upload_date = video_data[0][4],
+                                channel_id = video_data[0][3],
                                 description = description,
                                )
     server.close_connection()

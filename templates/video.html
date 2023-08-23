@@ -61,7 +61,7 @@
         </video>
         <div class="details">
           <h3 id="title">{{video_title}}</h3>
-          <p id="channel_name">{{channel_name}}</p>
+          <a href="/channel/{{channel_id}}"><p id="channel_name">{{channel_name}}</p></a>
           <p>{{upload_date}}</p>
           <button id="open-vlc-button" onclick="openInVLC('{{cdn}}/{{ video_id }}.webm')">Open in VLC</button>
           <br>
