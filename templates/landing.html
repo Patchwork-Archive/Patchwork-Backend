@@ -60,7 +60,7 @@
             <a href="/watch?v={{ video['video_id'] }}">
               <h3>{{ video['title'] }}</h3>
             </a>
-            <p>{{ video['channel_name'] }} - {{video['upload_date']}}</p>
+            <a href="/channel/{{video['channel_id']}}"><p>{{ video['channel_name'] }} - {{video['upload_date']}}</p></a>
           </div>
         </div>
         {% endfor %}
@@ -80,7 +80,7 @@
             <a href="/watch?v={{ video['video_id'] }}">
               <h3>{{ video['title'] }}</h3>
             </a>
-            <p>{{ video['channel_name'] }} - {{video['upload_date']}}</p>
+            <a href="/channel/{{video['channel_id']}}"><p>{{ video['channel_name'] }} - {{video['upload_date']}}</p></a>
           </div>
         </div>
         {% endfor %}
@@ -102,7 +102,7 @@
             <a href="/watch?v={{ video['video_id'] }}">
               <h3>{{ video['title'] }}</h3>
             </a>
-            <p>{{ video['channel_name'] }} - {{video['upload_date']}}</p>
+            <a href="/channel/{{video['channel_id']}}"><p>{{ video['channel_name'] }} - {{video['upload_date']}}</p></a>
           </div>
         </div>
         {% endfor %}

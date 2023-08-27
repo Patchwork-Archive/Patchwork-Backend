@@ -80,8 +80,8 @@
                 <img src="{{ thumbnails_domain }}/{{video['video_id']}}.jpg" alt="{{video['title']}} Thumbnail">
               </a>
               <div class="details">
-                <h3>{{ video['title'] }}</h3>
-                <p>{{ video['channel_name'] }} - {{video['upload_date']}}</p>
+                <a href="/watch?v={{ video['video_id'] }}"><h3>{{ video['title'] }}</h3></a>
+                <a href="/channel/{{channel_id}}"><p>{{ video['channel_name'] }} - {{video['upload_date']}}</p></a>
               </div>
             </div>
             {% endfor %}
