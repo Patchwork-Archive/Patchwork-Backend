@@ -125,7 +125,7 @@ main {
   color: #ffffff;
 }
 
-.details p {
+.details p,a {
   color: #ffffff;
   margin-bottom: 5px;
   font-size: 18px;
