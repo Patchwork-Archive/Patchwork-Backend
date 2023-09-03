@@ -14,6 +14,12 @@ function toggleDescription() {
 }
 
 function openInVLC(url) {
+  // if platform is not Mobile or tablet
+  if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+    if(!confirm("This feature is mainly for mobile devices who can't view WEBM videos natively in their browser. We detected that you're not on a mobile device. Try anyways?")){
+      return;
+    }
+  }
     window.location.href = 'vlc://' + url;
 }
 
