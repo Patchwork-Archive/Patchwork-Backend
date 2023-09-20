@@ -1,8 +1,6 @@
-# Video-Archive-Server
+# Patchwork Flask
 
 A Python Flask server that serves archived videos and metadata from a MySQL database. A bunch of stuff patched together.
-
-## Key Points
 - A Flask based server that serves archived videos and thumbnails from storage
 - Metadata is stored and served from a MySQL database
 - Able to track a queue of videos to be archived
