@@ -1,8 +1,6 @@
-# Video-Archive-Server
+# Patchwork Flask
 
 A Python Flask server that serves archived videos and metadata from a MySQL database. A bunch of stuff patched together.
-
-## Key Points
 - A Flask based server that serves archived videos and thumbnails from storage
 - Metadata is stored and served from a MySQL database
 - Able to track a queue of videos to be archived
@@ -11,7 +9,7 @@ A Python Flask server that serves archived videos and metadata from a MySQL data
 
 ## Getting Started
 ```bash
-git clone https://github.com/pinapelz/Video-Archive-Server.git && cd Video-Archive-Server
+git clone https://github.com/pinapelz/Patchwork-Flask.git && cd Patchwork-Flask
 python -m venv venv
 source venv/bin/activate # or venv\Scripts\activate.bat on Windows
 pip install -r requirements.txt
