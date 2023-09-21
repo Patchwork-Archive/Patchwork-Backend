@@ -198,7 +198,7 @@ def api_get_random_video():
     return dict_data
 
 @app.route("/api/discover_videos")
-def api_get_random_video():
+def api_get_discover_video():
     server = create_database_connection()
     count = request.args.get('count') if request.args.get('count') is not None else 6
     video_data = []
