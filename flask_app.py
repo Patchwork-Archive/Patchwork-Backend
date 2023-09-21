@@ -217,7 +217,7 @@ def api_get_random_video():
 
 
 @app.route("/api/daily_featured_videos")
-def apy_get_daily_featured():
+def api_get_daily_featured():
     server = create_database_connection()
     max_rows = server.get_query_result("SELECT COUNT(*) FROM songs")
     featured_indexes = pick_featured_videos(max_rows[0][0])
@@ -226,6 +226,14 @@ def apy_get_daily_featured():
     featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
     server.close_connection()
     return jsonify(featured_videos)
+
+@app.route("/api/recently_archived")
+def api_get_recently_archived():
+    server = create_database_connection()
+    archived_data = server.get_query_result("SELECT * FROM songs ORDER BY id DESC LIMIT 6;" )
+    recent_archived_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in archived_data]
+    server.close_connection()
+    return jsonify(recent_archived_videos)
 
 
 @app.route("/api/stats")
