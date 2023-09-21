@@ -130,7 +130,6 @@ def channel_page(channel_id):
     page_number = request.args.get('page') if request.args.get('page') is not None else 0
     start_range = int(page_number) * 9
     end_range = start_range + 9
-    # data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {str(int(page_number) * 15)}")
     data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {str(start_range)}, {str(end_range)}")
     videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     if len(videos) == 0:
@@ -197,6 +196,17 @@ def api_get_random_video():
     dict_data["description"] = data[0][5]
     server.close_connection()
     return dict_data
+
+@app.route("/api/daily_featured_videos")
+def apy_get_daily_featured():
+    server = create_database_connection()
+    max_rows = server.get_query_result("SELECT COUNT(*) FROM songs")
+    featured_indexes = pick_featured_videos(max_rows[0][0])
+    featured_query = f"SELECT * FROM songs WHERE id IN ({featured_indexes[0]}, {featured_indexes[1]})"
+    featured_data = server.get_query_result(featured_query)
+    featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
+    server.close_connection()
+    return jsonify(featured_videos)
 
 
 @app.route("/api/stats")
