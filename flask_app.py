@@ -197,6 +197,25 @@ def api_get_random_video():
     server.close_connection()
     return dict_data
 
+@app.route("/api/discover_videos")
+def api_get_random_video():
+    server = create_database_connection()
+    count = request.args.get('count') if request.args.get('count') is not None else 6
+    video_data = []
+    for i in range(int(count)):
+        data = server.get_random_row(table_name="songs")
+        dict_data = {}
+        dict_data["video_id"] = data[0][0]
+        dict_data["title"] = data[0][1]
+        dict_data["channel_name"] = data[0][2]
+        dict_data["channel_id"] = data[0][3]
+        dict_data["upload_date"] = data[0][4]
+        dict_data["description"] = data[0][5]
+        video_data.append(dict_data)
+    server.close_connection()
+    return jsonify(video_data)
+
+
 @app.route("/api/daily_featured_videos")
 def apy_get_daily_featured():
     server = create_database_connection()
