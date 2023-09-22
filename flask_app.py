@@ -181,6 +181,21 @@ def status_page():
                            workers = workers,
                            )
 
+@app.route("/api/status")
+def get_service_status():
+    server = create_database_connection()
+    worker_data = server.get_query_result("SELECT * FROM worker_status")
+    workers = []
+    for worker in worker_data:
+        worker_dict = {}
+        worker_dict["name"] = worker[1]
+        worker_dict["status"] = worker[3]
+        worker_dict["timestamp"] = worker[4]
+        workers.append(worker_dict)
+    server.close_connection()
+    return jsonify({"workers": workers}"})
+
+
 @app.route("/api/channel_name")
 def get_channel_name():
     server = create_database_connection()
