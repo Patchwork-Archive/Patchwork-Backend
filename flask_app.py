@@ -193,7 +193,7 @@ def get_service_status():
         worker_dict["timestamp"] = worker[4]
         workers.append(worker_dict)
     server.close_connection()
-    return jsonify({"workers": workers}"})
+    return jsonify({"workers": workers})
 
 
 @app.route("/api/channel_name")
