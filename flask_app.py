@@ -181,6 +181,14 @@ def status_page():
                            workers = workers,
                            )
 
+@app.route("/api/channel_name")
+def get_channel_name():
+    server = create_database_connection()
+    channel_id = request.args.get('channel_id')
+    data = server.get_query_result(f"SELECT channel_name FROM songs WHERE channel_id = '{channel_id}' LIMIT 1")
+    server.close_connection()
+    return jsonify({"channel_name": data[0][0]})
+
 @app.route("/api/search/results")
 def api_search_query():
     server = create_database_connection()
