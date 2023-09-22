@@ -167,6 +167,19 @@ def status_page():
                            workers = workers,
                            )
 
+@app.route("/api/search/results?q=")
+def api_search_query():
+    server = create_database_connection()
+    search_terms = request.args.get('search_query')
+    page = request.args.get('page') if request.args.get('page') is not None else 1
+    start_range = int(SITE_CONFIG["search_results_per_page"]) * (int(page) - 1)
+    data = server.search_video_row("songs", search_terms.split(), int(SITE_CONFIG["search_results_per_page"]), start_range)
+    server.close_connection()
+    search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
+    if len(search_result) == 0:
+        return jsonify({"error": "No results found"})
+    return jsonify(search_result)
+
 @app.route("/api/video/<video_id>")
 def api_get_video_data(video_id):
     server = create_database_connection()
