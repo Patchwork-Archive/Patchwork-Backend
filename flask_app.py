@@ -194,7 +194,7 @@ def api_get_video_data_from_database(video_id):
         dict_data["title"] = data[0][1]
         dict_data["channel"] = data[0][2]
         dict_data["channel_id"] = data[0][3]
-        dict_data["release_date"] = data[0][4]
+        dict_data["upload_date"] = data[0][4]
         dict_data["description"] = data[0][5]
         server.close_connection()
         return dict_data
