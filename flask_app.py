@@ -210,7 +210,7 @@ def api_get_stats():
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template("404.html"), 404
+    return jsonify({"error": "Page not found"}), 404
 
 @app.route("/api/worker/queue", methods=["POST"])
 def archive_url():
