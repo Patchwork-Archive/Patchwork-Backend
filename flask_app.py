@@ -33,7 +33,7 @@ def create_database_connection():
 
 
 def pick_featured_videos(max_videos: int):
-    today = datetime.datetime.now()
+    today = datetime.date.today()
     date_integer = int(today.strftime("%Y%m%d"))
     random.seed(date_integer)
     n1 = random.randint(1, max_videos)
