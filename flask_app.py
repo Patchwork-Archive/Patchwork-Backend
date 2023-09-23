@@ -393,6 +393,21 @@ def get_database_status():
     except Exception as e:
         return abort(500)
 
+@app.route("/api/storage/status", methods=["GET"])
+def get_storage_status():
+    """
+    Endpoint for workers to get the storage status
+    Number of videos and storage size
+    """
+    try:
+        server = create_database_connection()
+        storage_api = ManualStorageAPI(CONFIG["storage"]["api_token"], CONFIG["storage"]["accountID"], CONFIG["storage"]["bucket_name"], server)
+        number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
+        storage_size = str(round(int(storage_api.get_storage_used())/ (1024 **3), 2))
+        server.close_connection()
+        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size}), 200
+    except Exception as e:
+        return abort(500)
 
 if __name__ == "__main__":
     app.run(debug=True)
