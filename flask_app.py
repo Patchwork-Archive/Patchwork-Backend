@@ -46,6 +46,11 @@ def pick_featured_videos(max_videos: int):
 def landing_page():
     return redirect("https://patchwork.moekyun.me")
 
+@app.route("/watch")
+def watch_page():
+    video_id = request.args.get('v')
+    return redirect("https://patchwork.moekyun.me/watch?v=" + video_id)
+
 @app.route("/channel/<channel_id>")
 def channel_page(channel_id):
     server = create_database_connection()
