@@ -269,7 +269,7 @@ def get_next_video_in_queue():
         return None
     server.delete_row("archive_queue", "url", (next_video,))
     server.close_connection()
-    return next_video
+    return next_video, mode
 
 
 @app.route("/api/worker/next", methods=["GET"])
