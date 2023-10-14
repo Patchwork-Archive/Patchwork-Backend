@@ -245,11 +245,12 @@ def archive_url():
     except:
         abort(401)
     url = request.form.get('url')
+    mode = int(request.form.get('mode'))
 
     if server.check_row_exists("archive_queue", "url", url):
         server.close_connection()
         return "Already queued"
-    server.insert_row("archive_queue", "url", (url,))
+    server.insert_row("archive_queue", "url, forced", (url, mode,))
     server.insert_row("archive_log", "url, user, status, timestamp", (url, password, "Queued", datetime.datetime.now()))
     server.close_connection()
     return "OK", 200

@@ -35,7 +35,7 @@ def main():
         return
     print("Database connection established.\n")
     args = parser.parse_args()
-    server.create_table("archive_queue", "id INTEGER PRIMARY KEY AUTO_INCREMENT, url TEXT")
+    server.create_table("archive_queue", "id INTEGER PRIMARY KEY AUTO_INCREMENT, url TEXT, mode INTEGER")
     server.create_table("archive_queue_auth", "id INTEGER PRIMARY KEY AUTO_INCREMENT, token TEXT")
     server.create_table("archive_worker_auth", "id INTEGER PRIMARY KEY AUTO_INCREMENT, token TEXT")
     server.create_table("archive_log", "id INTEGER PRIMARY KEY AUTO_INCREMENT, url TEXT, user TEXT, status TEXT, timestamp TEXT")
