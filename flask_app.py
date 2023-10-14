@@ -263,6 +263,8 @@ def get_next_video_in_queue():
     server = create_database_connection()
     try:
         data = server.get_query_result("SELECT url, mode FROM archive_queue ORDER BY id LIMIT 1;")[0]
+        if data is None:
+            return None, None
         next_video, mode = data[0], data[1]
     except IndexError:
         server.close_connection()
