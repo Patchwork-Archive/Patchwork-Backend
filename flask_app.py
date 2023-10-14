@@ -250,7 +250,7 @@ def archive_url():
     if server.check_row_exists("archive_queue", "url", url):
         server.close_connection()
         return "Already queued"
-    server.insert_row("archive_queue", "url, forced", (url, mode,))
+    server.insert_row("archive_queue", "url, mode", (url, mode,))
     server.insert_row("archive_log", "url, user, status, timestamp", (url, password, "Queued", datetime.datetime.now()))
     server.close_connection()
     return "OK", 200
@@ -262,7 +262,8 @@ def get_next_video_in_queue():
     """
     server = create_database_connection()
     try:
-        next_video = server.get_query_result("SELECT url FROM archive_queue ORDER BY id LIMIT 1;")[0][0]
+        data = server.get_query_result("SELECT url FROM archive_queue ORDER BY id LIMIT 1;")[0]
+        next_video, mode = data[0], data[1]
     except IndexError:
         server.close_connection()
         return None
@@ -283,13 +284,13 @@ def get_next_in_queue():
             abort(401)
     except:
         abort(401)
-    next_video = get_next_video_in_queue()
+    next_video, mode = get_next_video_in_queue()
     if next_video is None:
         server.close_connection()
         return "No videos in queue", 204
     server.update_row("archive_log", "url", next_video, "status", "Processed",)
     server.close_connection()
-    return next_video
+    return jsonify({"next_video": next_video, "mode": mode})
 
 @app.route("/api/worker/heartbeat", methods=["POST"])
 def worker_heartbeat():
