@@ -126,7 +126,7 @@ def api_get_video_data(video_id):
         dict_data = {}
         dict_data["video_id"] = data[0][0]
         dict_data["title"] = data[0][1]
-        dict_data["channel_name"] = data[0][2]
+        dict_data["channel"] = data[0][2]
         dict_data["channel_id"] = data[0][3]
         dict_data["upload_date"] = data[0][4]
         dict_data["description"] = data[0][5]
