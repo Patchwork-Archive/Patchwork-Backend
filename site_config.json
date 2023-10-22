@@ -1,9 +1,3 @@
 {
-    "domain": "https://archive.pinapelz.moe",
-    "cdn": "https://cdn.pinapelz.com/VTuber%20Covers%20Archive",
-    "thumbnails_domain": "https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/thumbnails",
-    "metadata_domain": "https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/metadata",
-    "search_results_per_page": 14,
-    "enable_sync_radio": true,
-    "max_retry_attempts": 3
+    "search_results_per_page": 14
 }
