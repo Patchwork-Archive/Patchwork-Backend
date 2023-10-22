@@ -51,23 +51,6 @@ def watch_page():
     video_id = request.args.get('v')
     return redirect("https://patchwork.moekyun.me/watch?v=" + video_id)
 
-@app.route("/channel/<channel_id>")
-def channel_page(channel_id):
-    server = create_database_connection()
-    page_number = request.args.get('page') if request.args.get('page') is not None else 0
-    start_range = int(page_number) * 9
-    end_range = start_range + 9
-    data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {str(start_range)}, {str(end_range)}")
-    videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
-    if len(videos) == 0:
-        return render_template("search_no_result.html", search_terms="No videos found")
-    channel_name = videos[0]["channel_name"]
-    server.close_connection()
-    return render_template("channel.html",
-                           videos=videos,
-                           thumbnails_domain=SITE_CONFIG["thumbnails_domain"],
-                           channel_name=channel_name,)
-
 @app.route("/api/channel/<channel_id>")
 def api_get_channel_videos(channel_id):
     server = create_database_connection()
