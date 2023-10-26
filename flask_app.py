@@ -196,7 +196,7 @@ def api_get_video_data_from_database(video_id):
             server.close_connection()
             return jsonify(dict_data)
         server.close_connection()
-        return jsonify({"error": "Video ID does not exist"})
+        return jsonify({"error": "Video ID does not exist"}), 404
     elif response.status_code == 200:
         return jsonify(response.json())
     else:
