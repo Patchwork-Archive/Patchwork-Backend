@@ -324,7 +324,7 @@ def get_storage_status():
         server = create_database_connection()
         storage_api = ManualStorageAPI(CONFIG["storage"]["api_token"], CONFIG["storage"]["accountID"], CONFIG["storage"]["bucket_name"], server)
         number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
-        storage_size = str(round(int(storage_api.get_storage_used())/ (1024 **3), 2))
+        storage_size = str(storage_api.get_storage_used())
         server.close_connection()
         return jsonify({"number_of_files": number_of_files, "storage_size": storage_size}), 200
     except Exception as e:
