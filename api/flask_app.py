@@ -16,7 +16,7 @@ class SQLHandler:
         self.connection = self._create_server_connection()
         self._load_database(os.environ.get("DB_DATABASE"))
     
-    def _create_ssh_server_connection(self) -> mysql.connector:
+    def _create_server_connection(self) -> mysql.connector:
         connection = None
         try:
             connection = mysql.connector.connect(
