@@ -8,15 +8,18 @@ from mysql.connector import Error, errorcode
 from abc import ABC
 import requests
 import os
+import dotenv
+
+dotenv.load_dotenv()
 
 
     
 class SQLHandler:
     def __init__(self):
         self.connection = self._create_server_connection()
-        self._load_database(os.environ.get("DB_DATABASE"))
+        self._load_database(os.environ.get("DB_DATABASE").strip())
     
-    def _create_ssh_server_connection(self) -> mysql.connector:
+    def _create_server_connection(self) -> mysql.connector:
         connection = None
         try:
             connection = mysql.connector.connect(
@@ -52,7 +55,6 @@ class SQLHandler:
             print(f"Failed to load database: {err}")
             exit(1)
         try:
-            cursor.execute(f"USE {database_name}")
             print(f"Database {database_name} loaded successfully")
         except Error as err:
             print(f"Database {database_name} does not exist")

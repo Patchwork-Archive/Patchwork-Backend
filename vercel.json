@@ -15,7 +15,7 @@
 
         "src":"/(.*)",
 
-        "dest":"api/app.py"
+        "dest":"api/flask_app.py"
 
       }
 
