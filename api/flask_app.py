@@ -9,8 +9,6 @@ from abc import ABC
 import requests
 import os
 
-
-    
 class SQLHandler:
     def __init__(self):
         self.connection = self._create_server_connection()
@@ -483,7 +481,6 @@ def api_get_video_data_from_database(video_id):
     else:
         return jsonify({"error": f"Unexpected status code: {response.status_code}"})
     
-
 @app.route("/api/stats")
 def api_get_stats():
     server = create_database_connection()
