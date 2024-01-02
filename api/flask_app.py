@@ -365,6 +365,8 @@ def get_channel_name():
     channel_id = request.args.get('channel_id')
     data = server.get_query_result(f"SELECT channel_name FROM songs WHERE channel_id = '{channel_id}' LIMIT 1")
     server.close_connection()
+    if len(data) == 0:
+        return jsonify({"error": "Channel ID does not exist"})
     return jsonify({"channel_name": data[0][0]})
 
 @app.route("/api/search/results")
@@ -607,6 +609,28 @@ def get_storage_status():
         return jsonify({"number_of_files": number_of_files, "storage_size": storage_size}), 200
     except Exception as e:
         return abort(500)
+
+@app.route("/api/storage/delete", methods=["POST"])
+def delete_video():
+    """
+    Endpoint for workers to delete an archived video
+    """
+    password = request.headers.get('X-AUTHENTICATION')
+    video_id = request.form.get('video_id')
+    server = create_database_connection()
+    try:
+        if not server.check_row_exists("archive_worker_auth", "token", password):
+            abort(401)
+    except:
+        abort(401)
+    if server.check_row_exists("songs", "video_id", video_id):
+        server.delete_row("songs", "video_id", (video_id,))
+    try:
+        server.insert_row("archive_queue", "url, mode", (video_id, 2,))
+    except:
+        abort(401)
+    server.close_connection()
+    return "Video not found", 404
 
 if __name__ == "__main__":
     app.run(debug=True)
