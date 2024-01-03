@@ -221,13 +221,15 @@ class SQLHandler:
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
             query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
-
+        count_query = query
         query += " LIMIT %s OFFSET %s"
 
         try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
             cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
             result = cursor.fetchall()
-            return result
+            return result, result_count
         except Error as err:
             print("Error searching video row")
             print(err)
@@ -377,12 +379,13 @@ def api_search_query():
     search_terms = request.args.get('q')
     page = request.args.get('page') if request.args.get('page') is not None else 1
     start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
-    data = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+    data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     server.close_connection()
+    max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
     search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     if len(search_result) == 0:
         return jsonify({"pages": 0, "results": []})
-    return jsonify(search_result)
+    return jsonify({"pages":max_pages,"results":search_result})
 
 @app.route("/api/video/<video_id>")
 def api_get_video_data(video_id):
@@ -632,7 +635,6 @@ def delete_video():
     except:
         abort(401)
     server.close_connection()
-    return "Video not found", 404
 
 if __name__ == "__main__":
     app.run(debug=True)
