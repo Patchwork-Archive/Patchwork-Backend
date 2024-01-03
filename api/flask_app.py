@@ -341,11 +341,15 @@ def api_get_channel_videos(channel_id):
     start_range = (int(page_number) - 1) * 9
     end_range = start_range + 9
     data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {str(start_range)}, {str(end_range)}")
+    total_num_results = server.get_query_result(f"SELECT COUNT(*) FROM songs WHERE channel_id = '{channel_id}'")[0][0]
+    pages = total_num_results // 9
+    if pages == 0 and total_num_results != 0:
+        pages = 1
     videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     if len(videos) == 0:
         return render_template("search_no_result.html", search_terms="No videos found")
     server.close_connection()
-    return jsonify(videos)
+    return jsonify({"results": videos, "pages": pages})
 
 
 @app.route("/api/status")
