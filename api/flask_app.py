@@ -382,6 +382,8 @@ def api_search_query():
     data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     server.close_connection()
     max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
+    if max_pages == 0 and result_count != 0:
+        max_pages = 1
     search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     if len(search_result) == 0:
         return jsonify({"pages": 0, "results": []})
