@@ -327,7 +327,7 @@ def pick_featured_videos(max_videos: int):
 
 @app.route("/")
 def landing_page():
-    return redirect("https://patchwork.moekyun.me")
+    return render_template("index.html")
 
 @app.route("/watch")
 def watch_page():
