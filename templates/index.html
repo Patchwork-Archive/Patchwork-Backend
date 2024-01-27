@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Queuer Patchwork Archive</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        .scrollable-table {
+            height: 400px;
+            overflow-y: auto;
+            display: block;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            padding: 5px;
+            background-color: #000000;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .queue-form {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.1);
+        }
+
+        .queue-form input[type="text"], .queue-form input[type="password"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .queue-form input[type="submit"] {
+            background-color: #a045c7;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .queue-form input[type="submit"]:hover {
+            opacity: 0.8;
+        }
+
+        .warning {
+            color: red;
+            font-weight: bold;
+        }
+
+        #changeAuthKey {
+            background-color: #555;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #changeAuthKey:hover {
+            background-color: #333;
+        }
+        .container {
+    width: 60%; /* or any other percentage or fixed value you prefer */
+    margin: 0 auto; /* this will center your content */
+    padding: 0 20px; /* this will add padding around the sides */
+}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+    <h1>Patchwork Archive Backend Portal</h1>
+    <div class="scrollable-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in queue %}
+          <tr>
+            <td>{{ item }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p>There are currently {{ queue_length }} items in queue</p>
+    <h2>As a reminder...</h2>
+    <div>
+      <ol>
+        <li>
+          All videos queued must come from an official channel. No clippers
+        </li>
+        <li>No shorts that advertise full MVs (archive those instead)</li>
+        <li>Preferably no videos under 15 seconds or over 30 minutes</li>
+        <li>No non-VTuber related content</li>
+      </ol>
+    </div>
+    <div class="warning">
+      <h3>
+        <strong>ALERT:</strong> Please use the full
+        <i>youtube.com/watch?v=ID</i> link when possible!
+        <p>BE SURE TO DOUBLE CHECK WHAT YOU ARE QUEUEING</p>
+      </h3>
+    </div>
+    <div class="queue-form">
+      <form id="queueForm" action="/api/worker/queue" method="post">
+        <label for="url">URL:</label>
+        <input
+          type="text"
+          id="url"
+          name="url"
+          placeholder="https://www.youtube.com/watch?v=ID"
+          required
+        />
+        <label for="authKey">Authentication Key:</label>
+        <input
+          type="password"
+          id="authKey"
+          name="authKey"
+          placeholder="Enter your authentication key"
+          required
+        />
+        <input type="submit" value="Submit" />
+      </form>
+      <button id="changeAuthKey">Change Saved Authentication Key</button>
+    </div>
+    <p id="output"></p>
+</div>
+  </body>
+</html>
+<style>
+  .scrollable-table {
+    height: 200px;
+    overflow-y: auto;
+    display: block;
+  }
+</style>
+<script>
+  window.onload = function () {
+    var authKeyInput = document.getElementById("authKey");
+    var authKey = localStorage.getItem("authKey");
+    if (authKey) {
+      authKeyInput.value = authKey;
+    } else {
+      authKey = prompt("Please enter your authentication key");
+      if (authKey) {
+        localStorage.setItem("authKey", authKey);
+        authKeyInput.value = authKey;
+      }
+    }
+
+    document.getElementById("changeAuthKey").onclick = function () {
+      authKey = prompt("Please enter your new authentication key");
+      if (authKey) {
+        localStorage.setItem("authKey", authKey);
+        authKeyInput.value = authKey;
+      }
+    };
+
+    document.getElementById('queueForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var mode = 0;
+
+        var url = document.getElementById('url').value;
+        var authKey = document.getElementById('authKey').value;
+        var videoId = url.split('v=')[1];
+
+        if (!videoId) {
+            alert('Invalid URL. Please use the full youtube.com/watch?v=ID link');
+            return;
+        }
+        fetch(`/api/video/${videoId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.error) {
+                if (!confirm('This video is already in the archives. Is it missing a info.json (request re-archive)?')) {
+                    return;
+                }
+                mode = 1;
+            }
+            document.getElementById('output').textContent = "Sending request! Please wait..."
+            fetch('/api/worker/queue', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-AUTHENTICATION': authKey
+                },
+                body: new URLSearchParams({
+                    'url': url,
+                    'mode': mode
+                })
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('output').textContent = data + " Please refresh to see any potential changes to the queue!";
+                location.reload();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    });
+  };
+</script>
