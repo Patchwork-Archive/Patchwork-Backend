@@ -56,15 +56,17 @@ def watch_page():
 @app.route("/api/channel/<channel_id>")
 def api_get_channel_videos(channel_id):
     server = create_database_connection()
-    page_number = request.args.get('page') if request.args.get('page') is not None else 0
-    start_range = (int(page_number) - 1) * 9
-    end_range = start_range + 9
-    data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {str(start_range)}, {str(end_range)}")
+    page_number = int(request.args.get('page', 1))
+    results_per_page = int(os.environ.get("RESULTS_PER_PAGE", 9))
+    start_range = (page_number - 1) * results_per_page
+    data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {start_range}, {results_per_page}")
+    total_num_results = server.get_query_result(f"SELECT COUNT(*) FROM songs WHERE channel_id = '{channel_id}'")[0][0]
+    pages = (total_num_results + results_per_page - 1) // results_per_page
     videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
-    if len(videos) == 0:
-        return render_template("search_no_result.html", search_terms="No videos found")
     server.close_connection()
-    return jsonify(videos)
+    if not videos:
+        return jsonify({"pages": 0, "results": []})
+    return jsonify({"results": videos, "pages": pages})
 
 
 @app.route("/api/status")
