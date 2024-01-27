@@ -41,10 +41,12 @@ def pick_featured_videos(max_videos: int):
     n2 = random.randint(1, max_videos)
     return n1, n2
 
-
 @app.route("/")
 def landing_page():
-    return redirect("https://patchwork.moekyun.me")
+    server = create_database_connection()
+    current_queue = server.get_query_result("SELECT url FROM archive_queue")
+    server.close_connection()
+    return render_template("index.html", queue=current_queue, queue_length=len(current_queue))
 
 @app.route("/watch")
 def watch_page():
