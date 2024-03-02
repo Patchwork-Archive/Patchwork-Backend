@@ -157,6 +157,7 @@
       <button id="changeAuthKey">Change Saved Authentication Key</button>
     </div>
     <p id="output"></p>
+    <button id="deletionButton">Delete Video</button>
 </div>
   </body>
 </html>
@@ -188,6 +189,32 @@
         authKeyInput.value = authKey;
       }
     };
+
+    document.getElementById('deletionButton').addEventListener('click', function(event) {
+        event.preventDefault();
+        var videoId = prompt('Please enter the video ID to delete');
+        var deletionKey = prompt('This is a dangerous operation. Please enter your deletion key');
+        if (!videoId || !deletionKey) {
+            return;
+        }
+        fetch(`/api/storage/delete`, {
+            method: 'DELETE',
+            headers: {
+                'X-AUTHENTICATION': deletionKey,
+            },
+            body: new URLSearchParams({
+                'videoId': videoId
+            })
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('output').textContent = data + " Please refresh to see any potential changes to the queue!";
+            location.reload();
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    });
 
     document.getElementById('queueForm').addEventListener('submit', function(event) {
         event.preventDefault();
