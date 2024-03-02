@@ -622,7 +622,7 @@ def get_storage_status():
     except Exception as e:
         return abort(500)
 
-@app.route("/api/storage/delete", methods=["POST"])
+@app.route("/api/storage/delete", methods=["DELETE"])
 def delete_video():
     """
     Endpoint for workers to delete an archived video
