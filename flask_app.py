@@ -318,6 +318,28 @@ def get_database_status():
     except Exception as e:
         return abort(500)
 
+@app.route("/api/storage/delete", methods=["DELETE"])
+def delete_video():
+    """
+    Endpoint for workers to delete an archived video
+    """
+    password = request.headers.get('X-AUTHENTICATION')
+    video_id = request.form.get('video_id')
+    server = create_database_connection()
+    try:
+        if not server.check_row_exists("archive_worker_auth", "token", password):
+            abort(401)
+    except:
+        abort(401)
+    if server.check_row_exists("songs", "video_id", video_id):
+        server.delete_row("songs", "video_id", (video_id,))
+    try:
+        server.insert_row("archive_queue", "url, mode", (video_id, 2,))
+    except:
+        abort(401)
+    server.close_connection()
+
+
 @app.route("/api/storage/status", methods=["GET"])
 def get_storage_status():
     """
