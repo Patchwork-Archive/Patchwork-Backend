@@ -9,6 +9,7 @@ from abc import ABC
 import requests
 import os
 import dotenv
+import json
 import redis
 
 dotenv.load_dotenv()
@@ -324,13 +325,17 @@ class RedisHandler:
                                        )
 
     def set_kv_data(self, key: str, val: dict, expiry: int = None) -> None:
-        self._connection.hset(key, mapping=val)
-        if expiry is not None:
+        val = json.dumps(val)
+        self._connection.set(key, val)
+        if expiry:
             self._connection.expire(key, expiry)
-    
+
     def read_kv(self, key: str) -> str:
-        return self._connection.hgetall(key)
-    
+        val = self._connection.get(key)
+        if val is not None:
+            val = json.loads(val)
+        return val
+        
 
     def close_connection(self):
         self._connection.close()
@@ -456,10 +461,12 @@ def api_get_random_video():
 
 @app.route("/api/discover_videos")
 def api_get_discover_video():
-    redis_handler = RedisHandler()
-    discover_cache = redis_handler.read_kv("discover_videos")
-    if discover_cache:
-        return jsonify(discover_cache)
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        discover_cache = redis_handler.read_kv("discover_videos")
+        if discover_cache:
+            discover_cache = json.loads(discover_cache)  # Deserialize the data
+            return jsonify(discover_cache)
     server = create_database_connection()
     count = request.args.get('count') if request.args.get('count') is not None else 6
     video_data = []
@@ -474,16 +481,20 @@ def api_get_discover_video():
         dict_data["description"] = data[0][5]
         video_data.append(dict_data)
     server.close_connection()
-    redis_handler.set_kv_data("discover_videos", video_data, 3600)
+    if os.environ.get("USE_REDIS") == "True":
+        video_data_str = json.dumps(video_data)  # Serialize the data
+        redis_handler.set_kv_data("discover_videos", video_data_str, 3600)
     return jsonify(video_data)
 
 
 @app.route("/api/daily_featured_videos")
 def api_get_daily_featured():
-    redis_handler = RedisHandler()
-    daily_feat_cache = redis_handler.read_kv("daily_featured")
-    if daily_feat_cache:
-        return jsonify(daily_feat_cache)
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        daily_feat_cache = redis_handler.read_kv("daily_featured")
+        if daily_feat_cache:
+            daily_feat_cache = json.loads(daily_feat_cache)  # Deserialize the data
+            return jsonify(daily_feat_cache)
     server = create_database_connection()
     max_rows = server.get_query_result("SELECT COUNT(*) FROM songs")
     featured_indexes = pick_featured_videos(max_rows[0][0])
@@ -491,7 +502,9 @@ def api_get_daily_featured():
     featured_data = server.get_query_result(featured_query)
     featured_videos = {video[0]: {"title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data}
     server.close_connection()
-    redis_handler.set_kv_data("daily_featured", featured_videos, 86400)
+    if os.environ.get("USE_REDIS") == "True":
+        featured_videos_str = json.dumps(featured_videos)  # Serialize the data
+        redis_handler.set_kv_data("daily_featured", featured_videos_str, 86400)
     return jsonify(featured_videos)
 
 @app.route("/api/recently_archived")
