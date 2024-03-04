@@ -489,7 +489,7 @@ def api_get_daily_featured():
     featured_indexes = pick_featured_videos(max_rows[0][0])
     featured_query = f"SELECT * FROM songs WHERE id IN ({featured_indexes[0]}, {featured_indexes[1]})"
     featured_data = server.get_query_result(featured_query)
-    featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
+    featured_videos = {video[0]: {"title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data}
     server.close_connection()
     redis_handler.set_kv_data("daily_featured", featured_videos, 86400)
     return jsonify(featured_videos)
