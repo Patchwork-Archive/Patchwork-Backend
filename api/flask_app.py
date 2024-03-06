@@ -390,6 +390,12 @@ def api_get_channel_videos(channel_id):
 
 @app.route("/api/status")
 def get_service_status():
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        service_status = redis_handler.read_kv("service_status")
+        if service_status:
+            service_status = json.loads(service_status)  # Deserialize the data
+            return jsonify(service_status)
     server = create_database_connection()
     worker_data = server.get_query_result("SELECT * FROM worker_status")
     workers = []
@@ -400,6 +406,10 @@ def get_service_status():
         worker_dict["timestamp"] = worker[4]
         workers.append(worker_dict)
     server.close_connection()
+    if os.environ.get("USE_REDIS") == "True":
+        service_status = {"workers": workers}
+        service_status_str = json.dumps(service_status)
+        redis_handler.set_kv_data("service_status", service_status_str, 60)
     return jsonify({"workers": workers})
 
 
