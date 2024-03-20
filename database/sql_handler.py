@@ -1,53 +1,28 @@
 import mysql.connector
 from mysql.connector import Error, errorcode
 import sshtunnel
+import os
+import dotenv
 
 sshtunnel.SSH_TIMEOUT = 5.0
 sshtunnel.TUNNEL_TIMEOUT = 5.0
 
 class SQLHandler:
-    def __init__(self, host_name: str, user_name: str, user_password: str, database_name: str = None, ssh_host: str = None, ssh_username: str = None, ssh_password: str = None, ssh_remote_bind: str = None):
-        self.host_name = host_name
-        self.username = user_name
-        self.password = user_password
-        self.database_name = database_name
-        if ssh_host is None or ssh_username is None or ssh_password is None:
-            self.connection = self._create_server_connection(
-                host_name, user_name, user_password)
-        else:
-            self.connection = self._create_ssh_server_connection(
-                ssh_host, ssh_username, ssh_password, ssh_remote_bind, host_name, user_name, user_password)
-        if database_name is not None:
-            self._load_database(database_name)
-
-    def _create_server_connection(self, host_name: str, user_name: str, user_password: str) -> mysql.connector:
-        connection = None
-        try:
-            connection = mysql.connector.connect(host=host_name, user=user_name, passwd=user_password, charset="utf8mb4")
-            print("MySQL Database connection successful")
-        except Error as err:
-            print(f"Error: '{err}'")
-        return connection
+    def __init__(self):
+        self.connection = self._create_server_connection()
+        self._load_database(os.environ.get("DB_DATABASE").strip())
     
-    def _create_ssh_server_connection(self, ssh_host:str, ssh_username: str, ssh_password: str, remote_bind:str, host_name: str, user_name: str, user_password: str) -> mysql.connector:
+    def _create_server_connection(self) -> mysql.connector:
         connection = None
         try:
-            self._tunnel = sshtunnel.SSHTunnelForwarder(
-                (ssh_host),
-                ssh_username=ssh_username,
-                ssh_password=ssh_password,
-                remote_bind_address=(remote_bind, 3306),
-            )
-            self._tunnel.start()
-            print("SSH connection successful")
             connection = mysql.connector.connect(
-                host=host_name,
-                user=user_name,
-                passwd=user_password,
-                port=self._tunnel.local_bind_port,
-                database=self.database_name,
+            host=os.environ.get("DB_HOST"),
+            database=os.environ.get("DB_DATABASE"),
+            user=os.environ.get("DB_USERNAME"),
+            password=os.environ.get("DB_PASSWORD"),
+            ssl_ca=os.environ.get("SSL_CERT"),
+            use_pure=True
             )
-            print("MySQL Database connection successful")
         except Error as err:
             print(f"Error: '{err}'")
         if connection is None:
@@ -73,7 +48,6 @@ class SQLHandler:
             print(f"Failed to load database: {err}")
             exit(1)
         try:
-            cursor.execute(f"USE {database_name}")
             print(f"Database {database_name} loaded successfully")
         except Error as err:
             print(f"Database {database_name} does not exist")
@@ -242,16 +216,15 @@ class SQLHandler:
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
             query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
-
+        count_query = query
         query += " LIMIT %s OFFSET %s"
 
         try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
             cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
             result = cursor.fetchall()
-            return result
+            return result, result_count
         except Error as err:
             print("Error searching video row")
             print(err)
-
-
-

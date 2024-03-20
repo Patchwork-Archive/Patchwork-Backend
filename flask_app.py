@@ -1,36 +1,21 @@
 from flask import Flask, render_template, request, jsonify, abort, redirect
 from database.sql_handler import SQLHandler
+from database.redis_handler import RedisHandler
 from flask_cors import CORS
 from webapi.manual_storage_data import ManualStorageAPI
 import random
 import datetime
-import re
-import utils.fileutil as fileutil
+import os
+import json
 import requests
 
 app = Flask(__name__)
 CORS(app)
 current_radio_data = None
 
-if fileutil.check_file_exists("config.ini"):
-    CONFIG = fileutil.read_config("config.ini")
-    SITE_CONFIG = fileutil.read_site_config("site_config.json")
-else:
-    CONFIG = fileutil.read_config("/home/pinapelz/cover_viewer/config.ini")
-    SITE_CONFIG = fileutil.read_site_config("/home/pinapelz/cover_viewer/site_config.json")
 
 def create_database_connection():
-    hostname = CONFIG.get("database", "host")
-    user = CONFIG.get("database", "user")
-    password = CONFIG.get("database", "password")
-    database = CONFIG.get("database", "database")
-    ssh_host = CONFIG.get("database", "ssh_host")
-    ssh_username = CONFIG.get("database", "ssh_username")
-    ssh_password = CONFIG.get("database", "ssh_password")
-    remote_bind = CONFIG.get("database", "remote_bind")
-    if ssh_host.strip() == "" or ssh_username.strip() == "" or ssh_password.strip() == "":
-        return SQLHandler(hostname, user, password, database)
-    return SQLHandler(hostname, user, password, database, ssh_host, ssh_username, ssh_password, remote_bind)
+    return SQLHandler()
 
 
 def pick_featured_videos(max_videos: int):
@@ -40,6 +25,7 @@ def pick_featured_videos(max_videos: int):
     n1 = random.randint(1, max_videos)
     n2 = random.randint(1, max_videos)
     return n1, n2
+
 
 @app.route("/")
 def landing_page():
@@ -71,6 +57,12 @@ def api_get_channel_videos(channel_id):
 
 @app.route("/api/status")
 def get_service_status():
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        service_status = redis_handler.read_kv("service_status")
+        if service_status:
+            service_status = json.loads(service_status)  # Deserialize the data
+            return jsonify(service_status)
     server = create_database_connection()
     worker_data = server.get_query_result("SELECT * FROM worker_status")
     workers = []
@@ -81,6 +73,10 @@ def get_service_status():
         worker_dict["timestamp"] = worker[4]
         workers.append(worker_dict)
     server.close_connection()
+    if os.environ.get("USE_REDIS") == "True":
+        service_status = {"workers": workers}
+        service_status_str = json.dumps(service_status)
+        redis_handler.set_kv_data("service_status", service_status_str, 60)
     return jsonify({"workers": workers})
 
 
@@ -90,6 +86,8 @@ def get_channel_name():
     channel_id = request.args.get('channel_id')
     data = server.get_query_result(f"SELECT channel_name FROM songs WHERE channel_id = '{channel_id}' LIMIT 1")
     server.close_connection()
+    if len(data) == 0:
+        return jsonify({"error": "Channel ID does not exist"})
     return jsonify({"channel_name": data[0][0]})
 
 @app.route("/api/search/results")
@@ -97,13 +95,16 @@ def api_search_query():
     server = create_database_connection()
     search_terms = request.args.get('q')
     page = request.args.get('page') if request.args.get('page') is not None else 1
-    start_range = int(SITE_CONFIG["search_results_per_page"]) * (int(page) - 1)
-    data = server.search_video_row("songs", search_terms.split(), int(SITE_CONFIG["search_results_per_page"]), start_range)
+    start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
+    data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     server.close_connection()
+    max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
+    if max_pages == 0 and result_count != 0:
+        max_pages = 1
     search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     if len(search_result) == 0:
         return jsonify({"pages": 0, "results": []})
-    return jsonify(search_result)
+    return jsonify({"pages":max_pages,"results":search_result})
 
 @app.route("/api/video/<video_id>")
 def api_get_video_data(video_id):
@@ -137,10 +138,16 @@ def api_get_random_video():
 
 @app.route("/api/discover_videos")
 def api_get_discover_video():
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        discover_cache = redis_handler.read_kv("discover_videos")
+        if discover_cache:
+            discover_cache = json.loads(discover_cache)  # Deserialize the data
+            return jsonify(discover_cache)
     server = create_database_connection()
     count = request.args.get('count') if request.args.get('count') is not None else 6
     video_data = []
-    for i in range(int(count)):
+    for _ in range(int(count)):
         data = server.get_random_row(table_name="songs")
         dict_data = {}
         dict_data["video_id"] = data[0][0]
@@ -151,11 +158,20 @@ def api_get_discover_video():
         dict_data["description"] = data[0][5]
         video_data.append(dict_data)
     server.close_connection()
+    if os.environ.get("USE_REDIS") == "True":
+        video_data_str = json.dumps(video_data)  # Serialize the data
+        redis_handler.set_kv_data("discover_videos", video_data_str, 3600)
     return jsonify(video_data)
 
 
 @app.route("/api/daily_featured_videos")
 def api_get_daily_featured():
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        daily_feat_cache = redis_handler.read_kv("daily_featured")
+        if daily_feat_cache:
+            daily_feat_cache = json.loads(daily_feat_cache)  # Deserialize the data
+            return jsonify(daily_feat_cache)
     server = create_database_connection()
     max_rows = server.get_query_result("SELECT COUNT(*) FROM songs")
     featured_indexes = pick_featured_videos(max_rows[0][0])
@@ -163,6 +179,9 @@ def api_get_daily_featured():
     featured_data = server.get_query_result(featured_query)
     featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
     server.close_connection()
+    if os.environ.get("USE_REDIS") == "True":
+        featured_videos_str = json.dumps(featured_videos)  # Serialize the data
+        redis_handler.set_kv_data("daily_featured", featured_videos_str, 86400)
     return jsonify(featured_videos)
 
 @app.route("/api/recently_archived")
@@ -180,7 +199,7 @@ def api_get_video_data_from_database(video_id):
     Emulated the format of the data from the .info.json file generated by yt-dlp
     """
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+        'User-Agent': 'python-requests/2.31.0',
         'Content-Type': 'pythonanywhere'
     }
     response = requests.get(f"https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/metadata/{video_id}.info.json", headers=headers)
@@ -200,13 +219,12 @@ def api_get_video_data_from_database(video_id):
             server.close_connection()
             return jsonify(dict_data)
         server.close_connection()
-        return jsonify({"error": "Video ID does not exist"}), 404
+        return jsonify({"error": "Video ID does not exist"})
     elif response.status_code == 200:
         return jsonify(response.json())
     else:
         return jsonify({"error": f"Unexpected status code: {response.status_code}"})
     
-
 @app.route("/api/stats")
 def api_get_stats():
     server = create_database_connection()
@@ -318,6 +336,22 @@ def get_database_status():
     except Exception as e:
         return abort(500)
 
+@app.route("/api/storage/status", methods=["GET"])
+def get_storage_status():
+    """
+    Endpoint for workers to get the storage status
+    Number of videos and storage size
+    """
+    try:
+        server = create_database_connection()
+        storage_api = ManualStorageAPI(server)
+        number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
+        storage_size = str(round(int(storage_api.get_storage_used())/ (1024 **3), 2))
+        server.close_connection()
+        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size}), 200
+    except Exception as e:
+        return abort(500)
+
 @app.route("/api/storage/delete", methods=["DELETE"])
 def delete_video():
     """
@@ -339,22 +373,6 @@ def delete_video():
         abort(401)
     server.close_connection()
 
-
-@app.route("/api/storage/status", methods=["GET"])
-def get_storage_status():
-    """
-    Endpoint for workers to get the storage status
-    Number of videos and storage size
-    """
-    try:
-        server = create_database_connection()
-        storage_api = ManualStorageAPI(CONFIG["storage"]["api_token"], CONFIG["storage"]["accountID"], CONFIG["storage"]["bucket_name"], server)
-        number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
-        storage_size = str(storage_api.get_storage_used())
-        server.close_connection()
-        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size}), 200
-    except Exception as e:
-        return abort(500)
 
 if __name__ == "__main__":
     app.run(debug=True)
