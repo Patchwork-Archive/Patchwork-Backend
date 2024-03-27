@@ -236,8 +236,8 @@ class SQLHandler:
         keyword_conditions = [] 
 
         for keyword in keywords:
-            keyword_condition = f"LOWER(romanized_title) LIKE %s"
-            formatted_keyword = f"%{keyword.lower()}%"  
+            keyword_condition = f"LOWER(romanized_title) REGEXP %s"
+            formatted_keyword = f"\\b{keyword.lower()}\\b"  
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
             query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
