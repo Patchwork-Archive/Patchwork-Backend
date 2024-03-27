@@ -235,6 +235,30 @@ class SQLHandler:
         except Error as err:
             print("Error searching video row")
             print(err)
+    
+    def search_romanized(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+        cursor = self.connection.cursor(buffered=True)
+        query = f"SELECT * FROM {table_name} S JOIN romanized R on S.video_id=R.video_id WHERE 1=1"
+        keyword_conditions = [] 
+
+        for keyword in keywords:
+            keyword_condition = f"LOWER(romanized_title) LIKE %s"
+            formatted_keyword = f"%{keyword.lower()}%"  
+            keyword_conditions.append((keyword_condition, formatted_keyword))  
+        if keyword_conditions:
+            query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
+        count_query = query
+        query += " LIMIT %s OFFSET %s"
+
+        try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
+            cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
+            result = cursor.fetchall()
+            return result, result_count
+        except Error as err:
+            print("Error searching video row")
+            print(err)
 
 
 
@@ -429,7 +453,10 @@ def api_search_query():
     search_terms = request.args.get('q')
     page = request.args.get('page') if request.args.get('page') is not None else 1
     start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
-    data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+    if not all(ord(char) < 128 for char in search_terms):
+        data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+    else:
+        data, result_count = server.search_romanized("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     server.close_connection()
     max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
     if max_pages == 0 and result_count != 0:
