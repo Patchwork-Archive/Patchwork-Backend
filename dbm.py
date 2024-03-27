@@ -2,26 +2,11 @@
 Database Manager Module to be executed seperately for adding and removing auth tokens
 """
 from database.sql_handler import SQLHandler
-import utils.fileutil as fileutil
 import argparse
 
-if fileutil.check_file_exists("config.ini"):
-    CONFIG = fileutil.read_config("config.ini")
-else:
-    CONFIG = fileutil.read_config("/home/pinapelz/cover_viewer/config.ini")
 
 def create_database_connection():
-    hostname = CONFIG.get("database", "host")
-    user = CONFIG.get("database", "user")
-    password = CONFIG.get("database", "password")
-    database = CONFIG.get("database", "database")
-    ssh_host = CONFIG.get("database", "ssh_host")
-    ssh_username = CONFIG.get("database", "ssh_username")
-    ssh_password = CONFIG.get("database", "ssh_password")
-    remote_bind = CONFIG.get("database", "remote_bind")
-    if ssh_host.strip() == "" or ssh_username.strip() == "" or ssh_password.strip() == "":
-        return SQLHandler(hostname, user, password, database)
-    return SQLHandler(hostname, user, password, database, ssh_host, ssh_username, ssh_password, remote_bind)
+    return SQLHandler()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -42,6 +27,7 @@ def main():
     server.create_table("worker_status", "id INTEGER PRIMARY KEY AUTO_INCREMENT, name TEXT, token TEXT, status TEXT, timestamp TEXT")
     server.create_table("kv", "DATA VARCHAR(255) NOT NULL PRIMARY KEY, REFERENCE VARCHAR(255)")
     server.create_table("songs", "video_id VARCHAR(255) NOT NULL, title text, channel_name text, channel_id text, upload_date text, description text, id INTEGER PRIMARY KEY AUTO_INCREMENT")
+    server.create_table("romanized", "id INTEGER PRIMARY KEY AUTO_INCREMENT, video_id VARCHAR(255) NOT NULL, romanized_title text")
     
     if args.addqueuetoken is not None:
         print("Adding queue token...")

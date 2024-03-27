@@ -96,7 +96,10 @@ def api_search_query():
     search_terms = request.args.get('q')
     page = request.args.get('page') if request.args.get('page') is not None else 1
     start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
-    data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+    if not all(ord(char) < 128 for char in search_terms):
+        data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+    else:
+        data, result_count = server.search_romanized("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     server.close_connection()
     max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
     if max_pages == 0 and result_count != 0:

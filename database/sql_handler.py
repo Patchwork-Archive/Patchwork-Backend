@@ -7,6 +7,8 @@ import dotenv
 sshtunnel.SSH_TIMEOUT = 5.0
 sshtunnel.TUNNEL_TIMEOUT = 5.0
 
+dotenv.load_dotenv()
+
 class SQLHandler:
     def __init__(self):
         self.connection = self._create_server_connection()
@@ -20,7 +22,6 @@ class SQLHandler:
             database=os.environ.get("DB_DATABASE"),
             user=os.environ.get("DB_USERNAME"),
             password=os.environ.get("DB_PASSWORD"),
-            ssl_ca=os.environ.get("SSL_CERT"),
             use_pure=True
             )
         except Error as err:
@@ -212,6 +213,30 @@ class SQLHandler:
 
         for keyword in keywords:
             keyword_condition = f"LOWER(title) LIKE %s"
+            formatted_keyword = f"%{keyword.lower()}%"  
+            keyword_conditions.append((keyword_condition, formatted_keyword))  
+        if keyword_conditions:
+            query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
+        count_query = query
+        query += " LIMIT %s OFFSET %s"
+
+        try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
+            cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
+            result = cursor.fetchall()
+            return result, result_count
+        except Error as err:
+            print("Error searching video row")
+            print(err)
+    
+    def search_romanized(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+        cursor = self.connection.cursor(buffered=True)
+        query = f"SELECT * FROM {table_name} S JOIN romanized R on S.video_id=R.video_id WHERE 1=1"
+        keyword_conditions = [] 
+
+        for keyword in keywords:
+            keyword_condition = f"LOWER(romanized_title) LIKE %s"
             formatted_keyword = f"%{keyword.lower()}%"  
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
