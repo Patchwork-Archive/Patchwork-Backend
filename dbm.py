@@ -28,6 +28,7 @@ def main():
     server.create_table("kv", "DATA VARCHAR(255) NOT NULL PRIMARY KEY, REFERENCE VARCHAR(255)")
     server.create_table("songs", "video_id VARCHAR(255) NOT NULL, title text, channel_name text, channel_id text, upload_date text, description text, id INTEGER PRIMARY KEY AUTO_INCREMENT")
     server.create_table("romanized", "id INTEGER PRIMARY KEY AUTO_INCREMENT, video_id VARCHAR(255) NOT NULL, romanized_title text")
+    server.create_table("channels", "channel_id VARCHAR(255) PRIMARY KEY, channel_name TEXT NOT NULL, romanized_name TEXT, description TEXT")
     
     if args.addqueuetoken is not None:
         print("Adding queue token...")
