@@ -441,11 +441,17 @@ def get_service_status():
 def get_channel_name():
     server = create_database_connection()
     channel_id = request.args.get('channel_id')
-    data = server.get_query_result(f"SELECT channel_name FROM songs WHERE channel_id = '{channel_id}' LIMIT 1")
+    data = server.get_query_result(f"""
+    SELECT s.channel_name, c.description 
+    FROM songs s
+    JOIN channels c ON s.channel_id = c.channel_id
+    WHERE s.channel_id = '{channel_id}'
+    LIMIT 1
+    """)
     server.close_connection()
     if len(data) == 0:
         return jsonify({"error": "Channel ID does not exist"})
-    return jsonify({"channel_name": data[0][0]})
+    return jsonify({"channel_name": data[0][0], "description": data[0][1]})
 
 @app.route("/api/search/results")
 def api_search_query():
