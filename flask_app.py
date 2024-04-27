@@ -91,6 +91,10 @@ def get_channel_name():
     WHERE s.channel_id = '{channel_id}'
     LIMIT 1
     """)
+    if not data:
+        data = server.get_query_result(f"SELECT channel_name FROM songs WHERE channel_id = '{channel_id}' LIMIT 1")
+        server.close_connection()
+        return jsonify({"channel_name": data[0][0], "description": ""})
     server.close_connection()
     if len(data) == 0:
         return jsonify({"error": "Channel ID does not exist"})
