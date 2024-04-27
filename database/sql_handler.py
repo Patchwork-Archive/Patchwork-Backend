@@ -206,13 +206,13 @@ class SQLHandler:
             print("Error getting random row")
             print(err)
     
-    def search_video_row(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+    def search_row(self, table_name: str, col_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} WHERE 1=1"
         keyword_conditions = [] 
 
         for keyword in keywords:
-            keyword_condition = f"LOWER(title) LIKE %s"
+            keyword_condition = f"LOWER({col_name}) LIKE %s"
             formatted_keyword = f"%{keyword.lower()}%"  
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
@@ -230,13 +230,61 @@ class SQLHandler:
             print("Error searching video row")
             print(err)
     
-    def search_romanized(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+    def search_channel_row(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+        cursor = self.connection.cursor(buffered=True)
+        query = f"SELECT * FROM {table_name} WHERE 1=1"
+        keyword_conditions = [] 
+
+        for keyword in keywords:
+            keyword_condition = f"LOWER(channel_name) LIKE %s"
+            formatted_keyword = f"%{keyword.lower()}%"  
+            keyword_conditions.append((keyword_condition, formatted_keyword))  
+        if keyword_conditions:
+            query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
+        count_query = query
+        query += " LIMIT %s OFFSET %s"
+
+        try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
+            cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
+            result = cursor.fetchall()
+            return result, result_count
+        except Error as err:
+            print("Error searching video row")
+            print(err)
+    
+    def search_romanized_video(self, table_name: str, target_col: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} S JOIN romanized R on S.video_id=R.video_id WHERE 1=1"
         keyword_conditions = [] 
 
         for keyword in keywords:
-            keyword_condition = f"LOWER(romanized_title) REGEXP %s"
+            keyword_condition = f"LOWER({target_col}) REGEXP %s"
+            formatted_keyword = f"\\b{keyword.lower()}\\b"  
+            keyword_conditions.append((keyword_condition, formatted_keyword))  
+        if keyword_conditions:
+            query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
+        count_query = query
+        query += " LIMIT %s OFFSET %s"
+
+        try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
+            cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
+            result = cursor.fetchall()
+            return result, result_count
+        except Error as err:
+            print("Error searching video row")
+            print(err)
+    
+    def search_romanized_channel(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+        cursor = self.connection.cursor(buffered=True)
+        query = f"SELECT * FROM {table_name} WHERE 1=1"
+        keyword_conditions = [] 
+
+        for keyword in keywords:
+            keyword_condition = f"LOWER(romanized_name) REGEXP %s"
             formatted_keyword = f"\\b{keyword.lower()}\\b"  
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
