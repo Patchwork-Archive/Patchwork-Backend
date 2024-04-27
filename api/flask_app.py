@@ -212,13 +212,13 @@ class SQLHandler:
             print("Error getting random row")
             print(err)
     
-    def search_video_row(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+    def search_row(self, table_name: str, col_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} WHERE 1=1"
         keyword_conditions = [] 
 
         for keyword in keywords:
-            keyword_condition = f"LOWER(title) LIKE %s"
+            keyword_condition = f"LOWER({col_name}) LIKE %s"
             formatted_keyword = f"%{keyword.lower()}%"  
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
@@ -236,13 +236,13 @@ class SQLHandler:
             print("Error searching video row")
             print(err)
     
-    def search_romanized(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+    def search_channel_row(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
-        query = f"SELECT * FROM {table_name} S JOIN romanized R on S.video_id=R.video_id WHERE 1=1"
+        query = f"SELECT * FROM {table_name} WHERE 1=1"
         keyword_conditions = [] 
 
         for keyword in keywords:
-            keyword_condition = f"LOWER(romanized_title) LIKE %s"
+            keyword_condition = f"LOWER(channel_name) LIKE %s"
             formatted_keyword = f"%{keyword.lower()}%"  
             keyword_conditions.append((keyword_condition, formatted_keyword))  
         if keyword_conditions:
@@ -259,7 +259,54 @@ class SQLHandler:
         except Error as err:
             print("Error searching video row")
             print(err)
+    
+    def search_romanized_video(self, table_name: str, target_col: str, keywords: list, limit: int = 1, offset: int = 0):
+        cursor = self.connection.cursor(buffered=True)
+        query = f"SELECT * FROM {table_name} S JOIN romanized R on S.video_id=R.video_id WHERE 1=1"
+        keyword_conditions = [] 
 
+        for keyword in keywords:
+            keyword_condition = f"LOWER({target_col}) REGEXP %s"
+            formatted_keyword = f"\\b{keyword.lower()}\\b"  
+            keyword_conditions.append((keyword_condition, formatted_keyword))  
+        if keyword_conditions:
+            query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
+        count_query = query
+        query += " LIMIT %s OFFSET %s"
+
+        try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
+            cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
+            result = cursor.fetchall()
+            return result, result_count
+        except Error as err:
+            print("Error searching video row")
+            print(err)
+    
+    def search_romanized_channel(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
+        cursor = self.connection.cursor(buffered=True)
+        query = f"SELECT * FROM {table_name} WHERE 1=1"
+        keyword_conditions = [] 
+
+        for keyword in keywords:
+            keyword_condition = f"LOWER(romanized_name) REGEXP %s"
+            formatted_keyword = f"\\b{keyword.lower()}\\b"  
+            keyword_conditions.append((keyword_condition, formatted_keyword))  
+        if keyword_conditions:
+            query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
+        count_query = query
+        query += " LIMIT %s OFFSET %s"
+
+        try:
+            cursor.execute(count_query, ([condition[1] for condition in keyword_conditions]))
+            result_count = len(cursor.fetchall())
+            cursor.execute(query, ([condition[1] for condition in keyword_conditions] + [limit, offset]))
+            result = cursor.fetchall()
+            return result, result_count
+        except Error as err:
+            print("Error searching video row")
+            print(err)
 
 
 class WebAPI():
@@ -464,14 +511,33 @@ def api_search_query():
     page = request.args.get('page') if request.args.get('page') is not None else 1
     start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
     if not all(ord(char) < 128 for char in search_terms):
-        data, result_count = server.search_video_row("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+        data, result_count = server.search_row("songs","title", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     else:
-        data, result_count = server.search_romanized("songs", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+        data, result_count = server.search_romanized_video("songs", "romanized_title", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     server.close_connection()
     max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
     if max_pages == 0 and result_count != 0:
         max_pages = 1
     search_result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
+    if len(search_result) == 0:
+        return jsonify({"pages": 0, "results": []})
+    return jsonify({"pages":max_pages,"results":search_result})
+
+@app.route("/api/search/channel")
+def api_search_channel():
+    server = create_database_connection()
+    search_terms = request.args.get('q')
+    page = request.args.get('page') if request.args.get('page') is not None else 1
+    start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
+    if not all(ord(char) < 128 for char in search_terms):
+        data, result_count = server.search_video_row("channels", "channel_name", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+    else:
+        data, result_count = server.search_romanized_channel("channels", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+    server.close_connection()
+    max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
+    if max_pages == 0 and result_count != 0:
+        max_pages = 1
+    search_result = [{"channel_id": channel[0], "channel_name": channel[1], "description": channel[2]} for channel in data]
     if len(search_result) == 0:
         return jsonify({"pages": 0, "results": []})
     return jsonify({"pages":max_pages,"results":search_result})
