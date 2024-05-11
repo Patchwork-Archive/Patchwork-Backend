@@ -528,13 +528,13 @@ def api_search_channel():
     server = create_database_connection()
     search_terms = request.args.get('q')
     page = request.args.get('page') if request.args.get('page') is not None else 1
-    start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
+    start_range = int(os.environ.get("RESULTS_PER_PAGE_CHANNEL")) * (int(page) - 1)
     if not all(ord(char) < 128 for char in search_terms):
-        data, result_count = server.search_channel_row("channels", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+        data, result_count = server.search_channel_row("channels", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE_CHANNEL")), start_range)
     else:
-        data, result_count = server.search_romanized_channel("channels", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+        data, result_count = server.search_romanized_channel("channels", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE_CHANNEL")), start_range)
     server.close_connection()
-    max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE"))
+    max_pages = result_count // int(os.environ.get("RESULTS_PER_PAGE_CHANNEL"))
     if max_pages == 0 and result_count != 0:
         max_pages = 1
     search_result = [{"channel_id": channel[0], "channel_name": channel[1], "description": channel[2]} for channel in data]
