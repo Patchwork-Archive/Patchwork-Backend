@@ -126,7 +126,7 @@ def api_search_channel():
     page = request.args.get('page') if request.args.get('page') is not None else 1
     start_range = int(os.environ.get("RESULTS_PER_PAGE")) * (int(page) - 1)
     if not all(ord(char) < 128 for char in search_terms):
-        data, result_count = server.search_video_row("channels", "channel_name", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
+        data, result_count = server.search_channel_row("channels", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     else:
         data, result_count = server.search_romanized_channel("channels", search_terms.split(), int(os.environ.get("RESULTS_PER_PAGE")), start_range)
     server.close_connection()
