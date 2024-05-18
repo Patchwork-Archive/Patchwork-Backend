@@ -196,6 +196,30 @@ def api_get_discover_video():
         redis_handler.set_kv_data("discover_videos", video_data_str, 3600)
     return jsonify(video_data)
 
+@app.route("/api/discover_channels")
+def api_get_discover_channels():
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        discover_channels_cache = redis_handler.read_kv("discover_channels")
+        if discover_channels_cache:
+            discover_channels_cache = json.loads(discover_channels_cache)
+            return jsonify(discover_channels_cache)
+    server = create_database_connection()
+    count = request.args.get('count') if request.args.get('count') is not None else 6
+    channel_data = []
+    for _ in range(int(count)):
+        data = server.get_random_row(table_name="channels")
+        dict_data = {}
+        dict_data["channel_id"] = data[0][0]
+        dict_data["channel_name"] = data[0][1]
+        dict_data["romanized"] = data[0][2]
+        channel_data.append(dict_data)
+    server.close_connection()
+    if os.environ.get("USE_REDIS") == "True":
+        channel_data_str = json.dumps(channel_data)
+        redis_handler.set_kv_data("discover_channels", channel_data_str, 3600)
+    return jsonify(channel_data)
+
 
 @app.route("/api/daily_featured_videos")
 def api_get_daily_featured():
