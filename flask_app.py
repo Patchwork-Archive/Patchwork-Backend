@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, abort, redirect
 from database.sql_handler import SQLHandler
 from database.redis_handler import RedisHandler
 from flask_cors import CORS
-from webapi.manual_storage_data import ManualStorageAPI
+from webapi.storage_bucket import ManualStorageAPI
 import random
 import datetime
 import os
