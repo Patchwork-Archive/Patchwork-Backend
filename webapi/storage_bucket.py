@@ -3,8 +3,8 @@ from webapi.storage_api import StorageAPI
 from database.sql_handler import SQLHandler
 
 class ManualStorageAPI(StorageAPI):
-    def __init__(self, api_key: str, base_url: str, headers:dict, server: SQLHandler) -> None:
-        super().__init__(api_key, base_url, headers)
+    def __init__(self, server: SQLHandler) -> None:
+        super().__init__(None, None, None) # Since we only need to pull from DB
         self.server = server
 
     def get_storage_used(self) -> tuple[int,str]:
@@ -13,12 +13,11 @@ class ManualStorageAPI(StorageAPI):
         """
         print("Getting storage used")
         if not self.server.check_row_exists("kv", "DATA", "video_bucket_size"):
-            print("Inserting row")
             self.server.insert_row("kv", "DATA, REFERENCE", ("video_bucket_size", "0"))
         print(self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_size'"))
         storage_used = int(self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_size'")[0][0])
-
-        return storage_used
+        units = self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_size_units'")[0][0]
+        return storage_used, units
 
     def get_number_of_files(self) -> int:
         """

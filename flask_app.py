@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, abort, redirect
 from database.sql_handler import SQLHandler
 from database.redis_handler import RedisHandler
 from flask_cors import CORS
-from webapi.manual_storage_data import ManualStorageAPI
+from webapi.storage_bucket import ManualStorageAPI
 import random
 import datetime
 import os
@@ -403,10 +403,11 @@ def get_storage_status():
         server = create_database_connection()
         storage_api = ManualStorageAPI(server)
         number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
-        storage_size = str(round(int(storage_api.get_storage_used())/ (1024 **3), 2))
+        storage_size, storage_size_units  = storage_api.get_storage_used()
         server.close_connection()
-        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size}), 200
+        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size, "units": storage_size_units}), 200
     except Exception as e:
+        print(e)
         return abort(500)
 
 @app.route("/api/storage/delete", methods=["DELETE"])
