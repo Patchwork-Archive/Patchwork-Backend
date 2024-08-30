@@ -33,6 +33,23 @@ create table archive_worker_auth
 create index archive_worker_auth_token
     on archive_worker_auth (token);
 
+create table channels
+(
+    channel_id     varchar(255) not null
+        primary key,
+    channel_name   text         not null,
+    romanized_name text         null,
+    description    text         null
+);
+
+create table files
+(
+    video_id  varchar(255) not null
+        primary key,
+    size_mb   float        null,
+    extension varchar(32)  null
+);
+
 create table kv
 (
     DATA      varchar(255) not null
@@ -50,17 +67,6 @@ create table songs
     description  text         not null,
     id           int auto_increment
         primary key
-);
-
-create table channels
-(
-    channel_id     varchar(255) not null
-        primary key,
-    channel_name   text         not null,
-    romanized_name text         null,
-    description    text         null,
-    constraint channel_id_exists
-        foreign key (channel_id) references songs (channel_id)
 );
 
 create table romanized
