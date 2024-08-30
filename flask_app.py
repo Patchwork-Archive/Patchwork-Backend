@@ -260,9 +260,14 @@ def api_get_video_data_from_database(video_id):
         'Content-Type': 'pythonanywhere'
     }
     response = requests.get(f"https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/metadata/{video_id}.info.json", headers=headers)
-
+    server = create_database_connection()
+    data = server.get_query_result(f"SELECT * FROM files WHERE video_id = '{video_id}'")
+    file_size = 0
+    file_ext = ".webm"
+    if data:
+        file_size = data[0][1]
+        file_ext = data[0][2]
     if response.status_code == 404:
-        server = create_database_connection()
         if server.check_row_exists(table_name="songs", column_name="video_id", value=video_id):
             data = server.get_query_result(f"SELECT * FROM songs WHERE video_id = '{video_id}'")
             dict_data = {
@@ -271,14 +276,21 @@ def api_get_video_data_from_database(video_id):
                 "channel": data[0][2],
                 "channel_id": data[0][3],
                 "upload_date": data[0][4],
-                "description": data[0][5]
+                "description": data[0][5],
+                "file_size": file_size,
+                "file_size_units": "MB",
+                "file_ext": file_ext
             }
             server.close_connection()
             return jsonify(dict_data)
         server.close_connection()
         return jsonify({"error": "Video ID does not exist"})
     elif response.status_code == 200:
-        return jsonify(response.json())
+        dict_data = response.json()
+        dict_data["file_size"] = file_size
+        dict_data["file_size_units"] = "MB"
+        dict_data["file_ext"] = file_ext
+        return jsonify(dict_data)
     else:
         return jsonify({"error": f"Unexpected status code: {response.status_code}"})
 
