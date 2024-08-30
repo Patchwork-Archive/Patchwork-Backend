@@ -281,6 +281,20 @@ def api_get_video_data_from_database(video_id):
         return jsonify(response.json())
     else:
         return jsonify({"error": f"Unexpected status code: {response.status_code}"})
+
+@app.route("/api/database/file_data/<video_id>")
+def api_get_file_data(video_id):
+    server = create_database_connection()
+    if server.check_row_exists(table_name="files", column_name="video_id", value=video_id):
+        data = server.get_query_result(f"SELECT * FROM files WHERE video_id = '{video_id}'")
+        dict_data = {
+            "video_id": data[0][0],
+            "file_size": data[0][1],
+            "file_size_units": "MB",
+            "file_type": data[0][2]
+        }
+        server.close_connection()
+        return jsonify(dict_data)
     
 @app.route("/api/stats")
 def api_get_stats():
