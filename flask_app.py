@@ -85,7 +85,7 @@ def get_channel_name():
     server = create_database_connection()
     channel_id = request.args.get('channel_id')
     data = server.get_query_result(f"""
-    SELECT s.channel_name, c.description 
+    SELECT s.channel_name, c.description
     FROM songs s
     JOIN channels c ON s.channel_id = c.channel_id
     WHERE s.channel_id = '{channel_id}'
@@ -307,7 +307,7 @@ def api_get_file_data(video_id):
         }
         server.close_connection()
         return jsonify(dict_data)
-    
+
 @app.route("/api/stats")
 def api_get_stats():
     server = create_database_connection()
@@ -397,7 +397,7 @@ def worker_heartbeat():
             abort(401)
     except:
         abort(401)
-    
+
     if not server.check_row_exists("worker_status", "token", password):
         server.insert_row("worker_status", "name, token, status, timestamp", (name, password, status, datetime.datetime.now()))
     else:
@@ -442,7 +442,7 @@ def delete_video():
     Endpoint for workers to delete an archived video
     """
     password = request.headers.get('X-AUTHENTICATION')
-    video_id = request.form.get('video_id')
+    video_id = request.form.get('videoId')
     server = create_database_connection()
     try:
         if not server.check_row_exists("archive_worker_auth", "token", password):
