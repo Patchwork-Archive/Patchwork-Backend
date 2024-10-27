@@ -13,7 +13,7 @@ class SQLHandler:
     def __init__(self):
         self.connection = self._create_server_connection()
         self._load_database(os.environ.get("DB_DATABASE").strip())
-    
+
     def _create_server_connection(self) -> mysql.connector:
         connection = None
         try:
@@ -133,7 +133,7 @@ class SQLHandler:
         except Error as err:
             print("Error dropping table")
             print(err)
-    
+
     def check_row_exists(self, table_name: str, column_name: str, value: str):
         """
         Checks if a row exists in a table
@@ -162,17 +162,17 @@ class SQLHandler:
         except Error as err:
             print("Error updating row")
             print(err)
-    
-    def execute_query(self, query: str):
+
+    def execute_query(self, query: str, params: tuple = ()):
         cursor = self.connection.cursor(buffered=True)
         try:
-            cursor.execute(query)
+            cursor.execute(query, params)
             result = cursor.fetchall()
             return result
         except Error as err:
             print("Error executing query")
             print(err)
-    
+
     def get_query_result(self, query: str):
         cursor = self.connection.cursor(buffered=True)
         try:
@@ -195,7 +195,7 @@ class SQLHandler:
             print(err)
             return False
         return True
-    
+
     def get_random_row(self,table_name: str, limit: int = 1):
         cursor = self.connection.cursor(buffered=True)
         try:
@@ -205,16 +205,16 @@ class SQLHandler:
         except Error as err:
             print("Error getting random row")
             print(err)
-    
+
     def search_row(self, table_name: str, col_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} WHERE 1=1"
-        keyword_conditions = [] 
+        keyword_conditions = []
 
         for keyword in keywords:
             keyword_condition = f"LOWER({col_name}) LIKE %s"
-            formatted_keyword = f"%{keyword.lower()}%"  
-            keyword_conditions.append((keyword_condition, formatted_keyword))  
+            formatted_keyword = f"%{keyword.lower()}%"
+            keyword_conditions.append((keyword_condition, formatted_keyword))
         if keyword_conditions:
             query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
         count_query = query
@@ -229,16 +229,16 @@ class SQLHandler:
         except Error as err:
             print("Error searching video row")
             print(err)
-    
+
     def search_channel_row(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} WHERE 1=1"
-        keyword_conditions = [] 
+        keyword_conditions = []
 
         for keyword in keywords:
             keyword_condition = f"LOWER(channel_name) LIKE %s"
-            formatted_keyword = f"%{keyword.lower()}%"  
-            keyword_conditions.append((keyword_condition, formatted_keyword))  
+            formatted_keyword = f"%{keyword.lower()}%"
+            keyword_conditions.append((keyword_condition, formatted_keyword))
         if keyword_conditions:
             query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
         count_query = query
@@ -253,16 +253,16 @@ class SQLHandler:
         except Error as err:
             print("Error searching video row")
             print(err)
-    
+
     def search_romanized_video(self, table_name: str, target_col: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} S JOIN romanized R on S.video_id=R.video_id WHERE 1=1"
-        keyword_conditions = [] 
+        keyword_conditions = []
 
         for keyword in keywords:
             keyword_condition = f"LOWER({target_col}) REGEXP %s"
-            formatted_keyword = f"\\b{keyword.lower()}\\b"  
-            keyword_conditions.append((keyword_condition, formatted_keyword))  
+            formatted_keyword = f"\\b{keyword.lower()}\\b"
+            keyword_conditions.append((keyword_condition, formatted_keyword))
         if keyword_conditions:
             query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
         count_query = query
@@ -277,16 +277,16 @@ class SQLHandler:
         except Error as err:
             print("Error searching video row")
             print(err)
-    
+
     def search_romanized_channel(self, table_name: str, keywords: list, limit: int = 1, offset: int = 0):
         cursor = self.connection.cursor(buffered=True)
         query = f"SELECT * FROM {table_name} WHERE 1=1"
-        keyword_conditions = [] 
+        keyword_conditions = []
 
         for keyword in keywords:
             keyword_condition = f"LOWER(romanized_name) REGEXP %s"
-            formatted_keyword = f"\\b{keyword.lower()}\\b"  
-            keyword_conditions.append((keyword_condition, formatted_keyword))  
+            formatted_keyword = f"\\b{keyword.lower()}\\b"
+            keyword_conditions.append((keyword_condition, formatted_keyword))
         if keyword_conditions:
             query += " AND " + " AND ".join([condition[0] for condition in keyword_conditions])
         count_query = query

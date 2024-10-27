@@ -79,25 +79,28 @@ def get_service_status():
         redis_handler.set_kv_data("service_status", service_status_str, 60)
     return jsonify({"workers": workers})
 
-
 @app.route("/api/channel_name")
 def get_channel_name():
     server = create_database_connection()
     channel_id = request.args.get('channel_id')
-    data = server.get_query_result(f"""
+    query = """
     SELECT s.channel_name, c.description
     FROM songs s
     JOIN channels c ON s.channel_id = c.channel_id
-    WHERE s.channel_id = '{channel_id}'
+    WHERE s.channel_id = %s
+    ORDER BY s.upload_date DESC
     LIMIT 1
-    """)
+    """
+    data = server.execute_query(query, (channel_id,))
     if not data:
-        data = server.get_query_result(f"SELECT channel_name FROM songs WHERE channel_id = '{channel_id}' LIMIT 1")
+        query = "SELECT channel_name FROM songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT 1"
+        data = server.execute_query(query, (channel_id,))
         server.close_connection()
-        return jsonify({"channel_name": data[0][0], "description": ""})
+        if data:
+            return jsonify({"channel_name": data[0][0], "description": ""})
+        else:
+            return jsonify({"error": "Channel ID does not exist"})
     server.close_connection()
-    if len(data) == 0:
-        return jsonify({"error": "Channel ID does not exist"})
     return jsonify({"channel_name": data[0][0], "description": data[0][1]})
 
 @app.route("/api/search/results")
