@@ -257,6 +257,12 @@ def api_get_popular():
     """
     Gets the 6 videos that are most often accessed via the API
     """
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        daily_feat_cache = redis_handler.read_kv("popular")
+        if daily_feat_cache:
+            daily_feat_cache = json.loads(daily_feat_cache)  # Deserialize the data
+            return jsonify(daily_feat_cache)
     server  = create_database_connection()
     popular_songs = server.get_query_result("""
         SELECT songs.video_id, songs.title, songs.channel_name, songs.channel_id, songs.upload_date, songs.description
@@ -266,6 +272,9 @@ def api_get_popular():
         LIMIT 6;
     """)
     result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in popular_songs]
+    if os.environ.get("USE_REDIS") == "True":
+        featured_videos_str = json.dumps(result)  # Serialize the data
+        redis_handler.set_kv_data("popular", featured_videos_str, 86400)
     return result
 
 @app.route("/api/database/video_data/<video_id>")
