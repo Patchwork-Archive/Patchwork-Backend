@@ -274,7 +274,7 @@ def api_get_popular():
     result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in popular_songs]
     if os.environ.get("USE_REDIS") == "True":
         featured_videos_str = json.dumps(result)  # Serialize the data
-        redis_handler.set_kv_data("popular", featured_videos_str, 86400)
+        redis_handler.set_kv_data("popular", featured_videos_str, 3600)
     return result
 
 @app.route("/api/database/video_data/<video_id>")
