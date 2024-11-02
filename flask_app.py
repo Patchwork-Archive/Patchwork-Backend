@@ -45,8 +45,8 @@ def api_get_channel_videos(channel_id):
     page_number = int(request.args.get('page', 1))
     results_per_page = int(os.environ.get("RESULTS_PER_PAGE", 9))
     start_range = (page_number - 1) * results_per_page
-    data = server.get_query_result(f"SELECT * FROM songs WHERE channel_id = '{channel_id}' ORDER BY upload_date DESC LIMIT {start_range}, {results_per_page}")
-    total_num_results = server.get_query_result(f"SELECT COUNT(*) FROM songs WHERE channel_id = '{channel_id}'")[0][0]
+    data = server.get_query_result("SELECT * FROM songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT %s, %s", (channel_id, start_range, results_per_page, ))
+    total_num_results = server.get_query_result("SELECT COUNT(*) FROM songs WHERE channel_id = %s", (channel_id,))[0][0]
     pages = (total_num_results + results_per_page - 1) // results_per_page
     videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     server.close_connection()
@@ -146,7 +146,7 @@ def api_search_channel():
 def api_get_video_data(video_id):
     server = create_database_connection()
     if server.check_row_exists(table_name="songs", column_name="video_id", value=video_id):
-        data = server.get_query_result(f"SELECT * FROM songs WHERE video_id = '{video_id}'")
+        data = server.get_query_result("SELECT * FROM songs WHERE video_id = %s", (video_id,))
         dict_data = {}
         dict_data["video_id"] = data[0][0]
         dict_data["title"] = data[0][1]
@@ -264,7 +264,7 @@ def api_get_video_data_from_database(video_id):
     }
     response = requests.get(f"https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/metadata/{video_id}.info.json", headers=headers)
     server = create_database_connection()
-    data = server.get_query_result(f"SELECT * FROM files WHERE video_id = '{video_id}'")
+    data = server.get_query_result("SELECT * FROM files WHERE video_id = %s", (video_id,))
     file_size = 0
     file_ext = ".webm"
     if data:
@@ -272,7 +272,7 @@ def api_get_video_data_from_database(video_id):
         file_ext = data[0][2]
     if response.status_code == 404:
         if server.check_row_exists(table_name="songs", column_name="video_id", value=video_id):
-            data = server.get_query_result(f"SELECT * FROM songs WHERE video_id = '{video_id}'")
+            data = server.get_query_result("SELECT * FROM songs WHERE video_id = %s", (video_id,))
             dict_data = {
                 "video_id": data[0][0],
                 "title": data[0][1],
@@ -301,7 +301,7 @@ def api_get_video_data_from_database(video_id):
 def api_get_file_data(video_id):
     server = create_database_connection()
     if server.check_row_exists(table_name="files", column_name="video_id", value=video_id):
-        data = server.get_query_result(f"SELECT * FROM files WHERE video_id = '{video_id}'")
+        data = server.get_query_result("SELECT * FROM files WHERE video_id = %s", (video_id, ))
         dict_data = {
             "video_id": data[0][0],
             "file_size": data[0][1],
