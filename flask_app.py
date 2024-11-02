@@ -91,10 +91,10 @@ def get_channel_name():
     ORDER BY s.upload_date DESC
     LIMIT 1
     """
-    data = server.execute_query(query, (channel_id,))
+    data = server.get_query_result(query, (channel_id,))
     if not data:
         query = "SELECT channel_name FROM songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT 1"
-        data = server.execute_query(query, (channel_id,))
+        data = server.get_query_result(query, (channel_id,))
         server.close_connection()
         if data:
             return jsonify({"channel_name": data[0][0], "description": ""})
@@ -252,6 +252,22 @@ def api_get_recently_archived():
     server.close_connection()
     return jsonify(recent_archived_videos)
 
+@app.route("/api/popular")
+def api_get_popular():
+    """
+    Gets the 6 videos that are most often accessed via the API
+    """
+    server  = create_database_connection()
+    popular_songs = server.get_query_result("""
+        SELECT songs.video_id, songs.title, songs.channel_name, songs.channel_id, songs.upload_date, songs.description
+        FROM songs
+        JOIN views ON songs.video_id = views.video_id
+        ORDER BY views.view_count DESC
+        LIMIT 6;
+    """)
+    result = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in popular_songs]
+    return result
+
 @app.route("/api/database/video_data/<video_id>")
 def api_get_video_data_from_database(video_id):
     """
@@ -284,6 +300,10 @@ def api_get_video_data_from_database(video_id):
                 "file_size_units": "MB",
                 "file_ext": file_ext
             }
+            server.execute_query("""
+                INSERT INTO views (video_id, view_count) VALUES (%s, 1)
+                ON DUPLICATE KEY UPDATE view_count = view_count + 1"""
+                , (video_id,))
             server.close_connection()
             return jsonify(dict_data)
         server.close_connection()
@@ -293,6 +313,10 @@ def api_get_video_data_from_database(video_id):
         dict_data["file_size"] = file_size
         dict_data["file_size_units"] = "MB"
         dict_data["file_ext"] = file_ext
+        server.execute_query("""
+            INSERT INTO views (video_id, view_count) VALUES (%s, 1)
+            ON DUPLICATE KEY UPDATE view_count = view_count + 1"""
+            , (video_id,))
         return jsonify(dict_data)
     else:
         return jsonify({"error": f"Unexpected status code: {response.status_code}"})

@@ -169,16 +169,20 @@ class SQLHandler:
 
     def execute_query(self, query: str, params: tuple = ()):
         """
-        Executes a given query but requires it to have something to fetch
+        Executes a given query without fetching results and indicates if it was successful.
         """
         cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(query, params)
-            result = cursor.fetchall()
-            return result
+            self.connection.commit()
+            print("Query executed successfully")
+            return True
         except Error as err:
             print("Error executing query")
             print(err)
+            return False
+        finally:
+            cursor.close()
 
     def get_query_result(self, query: str, params: tuple = ()):
         cursor = self.connection.cursor(buffered=True)

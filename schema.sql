@@ -97,3 +97,12 @@ create table worker_status
     constraint valid_worker
         foreign key (token) references archive_worker_auth (token)
 );
+
+create table if not exists views
+(
+    video_id   varchar(255) not null
+        primary key,
+    view_count int          not null,
+    constraint views_songs_video_id_fk
+        foreign key (video_id) references patchwork_archive.songs (video_id)
+);
