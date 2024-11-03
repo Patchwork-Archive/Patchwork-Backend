@@ -344,12 +344,6 @@ def api_get_file_data(video_id):
         server.close_connection()
         return jsonify(dict_data)
 
-@app.route("/api/stats")
-def api_get_stats():
-    server = create_database_connection()
-    song_count = server.get_query_result("SELECT COUNT(video_id) FROM songs")
-    return jsonify({"song_count": song_count[0][0]})
-
 @app.errorhandler(404)
 def page_not_found(error):
     return jsonify({"error": "Page not found"}), 404
@@ -461,13 +455,19 @@ def get_storage_status():
     Endpoint for workers to get the storage status
     Number of videos and storage size
     """
+    if os.environ.get("USE_REDIS") == "True":
+        redis_handler = RedisHandler()
+        storage_cache = redis_handler.read_kv("storage")
+        if storage_cache:
+            return jsonify(storage_cache)
     try:
         server = create_database_connection()
-        storage_api = ManualStorageAPI(server)
         number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
-        storage_size, storage_size_units  = storage_api.get_storage_used()
+        storage_size  = float(server.get_query_result("SELECT SUM(size_mb) FROM files")[0][0])
         server.close_connection()
-        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size, "units": storage_size_units}), 200
+        if os.environ.get("USE_REDIS") == "True":
+            redis_handler.set_kv_data("storage", {"number_of_files": number_of_files, "storage_size": storage_size, "units": "MB"}, 3600)
+        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size, "units": "MB"}), 200
     except Exception as e:
         print(e)
         return abort(500)
