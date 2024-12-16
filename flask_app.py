@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, jsonify, abort, redirect
-from database.sql_handler import SQLHandler
-from database.redis_handler import RedisHandler
-from flask_cors import CORS
-from webapi.storage_bucket import ManualStorageAPI
-import random
 import datetime
-import os
 import json
+import os
+import random
+
 import requests
+from flask import Flask, abort, jsonify, redirect, render_template, request
+from flask_cors import CORS
+
+from database.redis_handler import RedisHandler
+from database.sql_handler import SQLHandler
 
 app = Flask(__name__)
 CORS(app)
@@ -360,7 +361,7 @@ def archive_url():
     try:
         if not server.check_row_exists("archive_queue_auth", "token", password):
             abort(401)
-    except:
+    except Exception:
         abort(401)
     url = request.form.get('url')
     mode = int(request.form.get('mode'))
@@ -402,7 +403,7 @@ def get_next_in_queue():
     try:
         if not server.check_row_exists("archive_worker_auth", "token", password):
             abort(401)
-    except:
+    except Exception:
         abort(401)
     next_video, mode = get_next_video_in_queue()
     if next_video is None:
@@ -425,7 +426,7 @@ def worker_heartbeat():
     try:
         if not server.check_row_exists("archive_worker_auth", "token", password):
             abort(401)
-    except:
+    except Exception:
         abort(401)
 
     if not server.check_row_exists("worker_status", "token", password):
@@ -446,7 +447,7 @@ def get_database_status():
         server = create_database_connection()
         server.close_connection()
         return "OK", 200
-    except Exception as e:
+    except Exception:
         return abort(500)
 
 @app.route("/api/storage/status", methods=["GET"])
@@ -464,10 +465,11 @@ def get_storage_status():
         server = create_database_connection()
         number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
         storage_size  = float(server.get_query_result("SELECT SUM(size_mb) FROM files")[0][0])
+        most_recenty_archived_video_date = server.get_query_result("SELECT upload_date FROM songs ORDER BY id DESC LIMIT 1")[0][0]
         server.close_connection()
         if os.environ.get("USE_REDIS") == "True":
-            redis_handler.set_kv_data("storage", {"number_of_files": number_of_files, "storage_size": storage_size, "units": "MB"}, 3600)
-        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size, "units": "MB"}), 200
+            redis_handler.set_kv_data("storage", {"number_of_files": number_of_files, "storage_size": storage_size, "most_recent_archived_video_date": most_recenty_archived_video_date, "units": "MB"}, 3600)
+        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size, "units": "MB", "most_recent_archived_video_date": most_recenty_archived_video_date}), 200
     except Exception as e:
         print(e)
         return abort(500)
@@ -483,13 +485,13 @@ def delete_video():
     try:
         if not server.check_row_exists("archive_worker_auth", "token", password):
             abort(401)
-    except:
+    except Exception:
         abort(401)
     if server.check_row_exists("songs", "video_id", video_id):
         server.delete_row("songs", "video_id", (video_id,))
     try:
         server.insert_row("archive_queue", "url, mode", (video_id, 2,))
-    except:
+    except Exception:
         abort(401)
     server.close_connection()
 
