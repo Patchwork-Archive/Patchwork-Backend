@@ -466,7 +466,7 @@ def get_storage_status():
         number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
         storage_size  = float(server.get_query_result("SELECT SUM(size_mb) FROM files")[0][0])
         number_of_channels = int(server.get_query_result("SELECT COUNT(DISTINCT channel_id) FROM songs")[0][0])
-        most_recenty_archived_video_date = server.get_query_result("SELECT upload_date FROM songs ORDER BY id DESC LIMIT 1")[0][0]
+        most_recenty_archived_video_date = server.get_query_result("SELECT upload_date FROM songs ORDER BY upload_date DESC LIMIT 1")[0][0]
         server.close_connection()
         if os.environ.get("USE_REDIS") == "True":
             redis_handler.set_kv_data("storage",
