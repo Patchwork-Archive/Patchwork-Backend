@@ -465,11 +465,27 @@ def get_storage_status():
         server = create_database_connection()
         number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
         storage_size  = float(server.get_query_result("SELECT SUM(size_mb) FROM files")[0][0])
+        number_of_channels = int(server.get_query_result("SELECT COUNT(DISTINCT channel_id) FROM songs")[0][0])
         most_recenty_archived_video_date = server.get_query_result("SELECT upload_date FROM songs ORDER BY id DESC LIMIT 1")[0][0]
         server.close_connection()
         if os.environ.get("USE_REDIS") == "True":
-            redis_handler.set_kv_data("storage", {"number_of_files": number_of_files, "storage_size": storage_size, "most_recent_archived_video_date": most_recenty_archived_video_date, "units": "MB"}, 3600)
-        return jsonify({"number_of_files": number_of_files, "storage_size": storage_size, "units": "MB", "most_recent_archived_video_date": most_recenty_archived_video_date}), 200
+            redis_handler.set_kv_data("storage",
+                {
+                    "number_of_files": number_of_files,
+                    "storage_size": storage_size,
+                    "number_of_channels": number_of_channels,
+                    "most_recent_archived_video_date": most_recenty_archived_video_date,
+                    "units": "MB"
+                }
+            , 3600)
+        return jsonify(
+            {
+                "number_of_files": number_of_files,
+                "storage_size": storage_size,
+                "number_of_channels": number_of_channels,
+                "most_recent_archived_video_date": most_recenty_archived_video_date,
+                "units": "MB"
+        }), 200
     except Exception as e:
         print(e)
         return abort(500)
