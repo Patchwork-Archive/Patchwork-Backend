@@ -93,6 +93,7 @@ def get_channel_name():
     LIMIT 1
     """
     data = server.get_query_result(query, (channel_id,))
+    aliases = [alias[0] for alias in server.get_query_result("SELECT DISTINCT channel_name FROM songs WHERE channel_id = %s", (channel_id,))]
     if not data:
         query = "SELECT channel_name FROM songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT 1"
         data = server.get_query_result(query, (channel_id,))
@@ -102,7 +103,7 @@ def get_channel_name():
         else:
             return jsonify({"error": "Channel ID does not exist"})
     server.close_connection()
-    return jsonify({"channel_name": data[0][0], "description": data[0][1]})
+    return jsonify({"channel_name": data[0][0], "description": data[0][1], "aliases": aliases})
 
 @app.route("/api/search/results")
 def api_search_query():
