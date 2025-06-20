@@ -8,7 +8,7 @@ class StorageAPI(ABC, WebAPI):
     """
     def __init__(self, api_key: str, base_url: str, headers:dict) -> None:
         super().__init__(api_key, base_url, headers)
-    
+
     def get_storage_used(self) -> tuple[int,str]:
         """
         Returns the amount of storage used and the unit of measurement
@@ -20,4 +20,3 @@ class StorageAPI(ABC, WebAPI):
         Returns the number of files stored
         """
         pass
-    

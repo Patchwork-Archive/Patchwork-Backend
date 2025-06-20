@@ -28,4 +28,3 @@ class ManualStorageAPI(StorageAPI):
         obj_count = int(self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_count'")[0][0])
         print(obj_count)
         return obj_count
-    
