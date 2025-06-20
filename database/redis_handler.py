@@ -1,8 +1,9 @@
 import os
 import redis
 import json
-import dotenv
+from dotenv import load_dotenv
 
+load_dotenv()
 class RedisHandler:
     def __init__(self,
                 hostname: str=os.environ.get("REDIS_HOST"),
@@ -16,7 +17,7 @@ class RedisHandler:
                                        password=password,
                                        port=port,
                                        decode_responses=decode_responses,
-                                       ssl=True,   
+                                       ssl=True,
                                        )
 
     def set_kv_data(self, key: str, val: dict, expiry: int = None) -> None:
@@ -30,7 +31,7 @@ class RedisHandler:
         if val is not None:
             val = json.loads(val)
         return val
-        
+
 
     def close_connection(self):
         self._connection.close()
