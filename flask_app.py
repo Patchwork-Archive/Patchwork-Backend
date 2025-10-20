@@ -515,6 +515,22 @@ def delete_video():
         abort(401)
     server.close_connection()
 
+@app.route('/api/exact_match', methods=['POST'])
+def api_exact_match():
+    server = create_database_connection()
+    title = request.form.get('title')
+    channel_name = request.form.get('channel_name')
+    if not title or not channel_name:
+        server.close_connection()
+        return jsonify({"error": "Missing title or channel_name parameter"}), 400
+    query = "SELECT video_id FROM songs WHERE title = %s AND channel_name = %s"
+    result = server.get_query_result(query, (title, channel_name))
+    server.close_connection()
+    if not result:
+        return jsonify({"error": "No exact match found"}), 404
+    video_id = result[0][0]
+    return jsonify({"video_id": video_id})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
