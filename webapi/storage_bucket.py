@@ -14,9 +14,9 @@ class ManualStorageAPI(StorageAPI):
         print("Getting storage used")
         if not self.server.check_row_exists("kv", "DATA", "video_bucket_size"):
             self.server.insert_row("kv", "DATA, REFERENCE", ("video_bucket_size", "0"))
-        print(self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_size'"))
-        storage_used = int(self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_size'")[0][0])
-        units = self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_size_units'")[0][0]
+        print(self.server.get_query_result("SELECT REFERENCE FROM patchwork_archive.kv WHERE DATA = 'video_bucket_size'"))
+        storage_used = int(self.server.get_query_result("SELECT REFERENCE FROM patchwork_archive.kv WHERE DATA = 'video_bucket_size'")[0][0])
+        units = self.server.get_query_result("SELECT REFERENCE FROM patchwork_archive.kv WHERE DATA = 'video_bucket_size_units'")[0][0]
         return storage_used, units
 
     def get_number_of_files(self) -> int:
@@ -25,6 +25,6 @@ class ManualStorageAPI(StorageAPI):
         """
         if not self.server.check_row_exists("kv", "DATA", "video_bucket_count"):
             self.server.insert_row("kv", "DATA, REFERENCE", ("video_bucket_count", "0"))
-        obj_count = int(self.server.get_query_result("SELECT REFERENCE FROM kv WHERE DATA = 'video_bucket_count'")[0][0])
+        obj_count = int(self.server.get_query_result("SELECT REFERENCE FROM patchwork_archive.kv WHERE DATA = 'video_bucket_count'")[0][0])
         print(obj_count)
         return obj_count
