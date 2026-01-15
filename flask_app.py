@@ -34,7 +34,7 @@ def pick_featured_videos(max_videos: int):
 @app.route("/")
 def landing_page():
     server = create_database_connection()
-    current_queue = server.get_query_result("SELECT url FROM archive_queue")
+    current_queue = server.get_query_result("SELECT url FROM patchwork_archive.archive_queue")
     server.close_connection()
     return render_template("index.html", queue=current_queue, queue_length=len(current_queue))
 
@@ -49,8 +49,8 @@ def api_get_channel_videos(channel_id):
     page_number = int(request.args.get('page', 1))
     results_per_page = int(os.environ.get("RESULTS_PER_PAGE", 9))
     start_range = (page_number - 1) * results_per_page
-    data = server.get_query_result("SELECT * FROM songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT %s, %s", (channel_id, start_range, results_per_page, ))
-    total_num_results = server.get_query_result("SELECT COUNT(*) FROM songs WHERE channel_id = %s", (channel_id,))[0][0]
+    data = server.get_query_result("SELECT * FROM patchwork_archive.songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT %s OFFSET %s", (channel_id, results_per_page, start_range, ))
+    total_num_results = server.get_query_result("SELECT COUNT(*) FROM patchwork_archive.songs WHERE channel_id = %s", (channel_id,))[0][0]
     pages = (total_num_results + results_per_page - 1) // results_per_page
     videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in data]
     server.close_connection()
@@ -68,7 +68,7 @@ def get_service_status():
             service_status = json.loads(service_status)  # Deserialize the data
             return jsonify(service_status)
     server = create_database_connection()
-    worker_data = server.get_query_result("SELECT * FROM worker_status")
+    worker_data = server.get_query_result("SELECT * FROM patchwork_archive.worker_status")
     workers = []
     for worker in worker_data:
         worker_dict = {}
@@ -89,16 +89,16 @@ def get_channel_name():
     channel_id = request.args.get('channel_id')
     query = """
     SELECT s.channel_name, c.description
-    FROM songs s
-    JOIN channels c ON s.channel_id = c.channel_id
+    FROM patchwork_archive.songs s
+    JOIN patchwork_archive.channels c ON s.channel_id = c.channel_id
     WHERE s.channel_id = %s
     ORDER BY s.upload_date DESC
     LIMIT 1
     """
     data = server.get_query_result(query, (channel_id,))
-    aliases = [alias[0] for alias in server.get_query_result("SELECT DISTINCT channel_name FROM songs WHERE channel_id = %s", (channel_id,))]
+    aliases = [alias[0] for alias in server.get_query_result("SELECT DISTINCT channel_name FROM patchwork_archive.songs WHERE channel_id = %s", (channel_id,))]
     if not data:
-        query = "SELECT channel_name FROM songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT 1"
+        query = "SELECT channel_name FROM patchwork_archive.songs WHERE channel_id = %s ORDER BY upload_date DESC LIMIT 1"
         data = server.get_query_result(query, (channel_id,))
         server.close_connection()
         if data:
@@ -151,7 +151,7 @@ def api_search_channel():
 def api_get_video_data(video_id):
     server = create_database_connection()
     if server.check_row_exists(table_name="songs", column_name="video_id", value=video_id):
-        data = server.get_query_result("SELECT * FROM songs WHERE video_id = %s", (video_id,))
+        data = server.get_query_result("SELECT * FROM patchwork_archive.songs WHERE video_id = %s", (video_id,))
         dict_data = {}
         dict_data["video_id"] = data[0][0]
         dict_data["title"] = data[0][1]
@@ -238,9 +238,9 @@ def api_get_daily_featured():
             daily_feat_cache = json.loads(daily_feat_cache)  # Deserialize the data
             return jsonify(daily_feat_cache)
     server = create_database_connection()
-    max_rows = server.get_query_result("SELECT COUNT(*) FROM songs")
+    max_rows = server.get_query_result("SELECT COUNT(*) FROM patchwork_archive.songs")
     featured_indexes = pick_featured_videos(max_rows[0][0])
-    featured_query = f"SELECT * FROM songs WHERE id IN ({featured_indexes[0]}, {featured_indexes[1]})"
+    featured_query = f"SELECT * FROM patchwork_archive.songs WHERE id IN ({featured_indexes[0]}, {featured_indexes[1]})"
     featured_data = server.get_query_result(featured_query)
     featured_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in featured_data]
     server.close_connection()
@@ -252,7 +252,7 @@ def api_get_daily_featured():
 @app.route("/api/recently_archived")
 def api_get_recently_archived():
     server = create_database_connection()
-    archived_data = server.get_query_result("SELECT * FROM songs ORDER BY id DESC LIMIT 6;" )
+    archived_data = server.get_query_result("SELECT * FROM patchwork_archive.songs ORDER BY id DESC LIMIT 6;" )
     recent_archived_videos = [{"video_id": video[0], "title": video[1], "channel_name": video[2], "channel_id": video[3], "upload_date": video[4], "description": video[5]} for video in archived_data]
     server.close_connection()
     return jsonify(recent_archived_videos)
@@ -271,8 +271,8 @@ def api_get_popular():
     server  = create_database_connection()
     popular_songs = server.get_query_result("""
         SELECT songs.video_id, songs.title, songs.channel_name, songs.channel_id, songs.upload_date, songs.description
-        FROM songs
-        JOIN views ON songs.video_id = views.video_id
+        FROM patchwork_archive.songs songs
+        JOIN patchwork_archive.views views ON songs.video_id = views.video_id
         ORDER BY views.view_count DESC
         LIMIT 6;
     """)
@@ -294,7 +294,7 @@ def api_get_video_data_from_database(video_id):
     }
     response = requests.get(f"https://content.pinapelz.com/file/vtuber-rabbit-hole-archive/VTuber+Covers+Archive/metadata/{video_id}.info.json", headers=headers)
     server = create_database_connection()
-    data = server.get_query_result("SELECT * FROM files WHERE video_id = %s", (video_id,))
+    data = server.get_query_result("SELECT * FROM patchwork_archive.files WHERE video_id = %s", (video_id,))
     file_size = 0
     file_ext = ".webm"
     if data:
@@ -302,7 +302,7 @@ def api_get_video_data_from_database(video_id):
         file_ext = data[0][2]
     if response.status_code == 404:
         if server.check_row_exists(table_name="songs", column_name="video_id", value=video_id):
-            data = server.get_query_result("SELECT * FROM songs WHERE video_id = %s", (video_id,))
+            data = server.get_query_result("SELECT * FROM patchwork_archive.songs WHERE video_id = %s", (video_id,))
             dict_data = {
                 "video_id": data[0][0],
                 "title": data[0][1],
@@ -315,8 +315,8 @@ def api_get_video_data_from_database(video_id):
                 "file_ext": file_ext
             }
             server.execute_query("""
-                INSERT INTO views (video_id, view_count) VALUES (%s, 1)
-                ON DUPLICATE KEY UPDATE view_count = view_count + 1"""
+                INSERT INTO patchwork_archive.views (video_id, view_count) VALUES (%s, 1)
+                ON CONFLICT (video_id) DO UPDATE SET view_count = patchwork_archive.views.view_count + 1"""
                 , (video_id,))
             server.close_connection()
             return jsonify(dict_data)
@@ -328,8 +328,8 @@ def api_get_video_data_from_database(video_id):
         dict_data["file_size_units"] = "MB"
         dict_data["file_ext"] = file_ext
         server.execute_query("""
-            INSERT INTO views (video_id, view_count) VALUES (%s, 1)
-            ON DUPLICATE KEY UPDATE view_count = view_count + 1"""
+            INSERT INTO patchwork_archive.views (video_id, view_count) VALUES (%s, 1)
+            ON CONFLICT (video_id) DO UPDATE SET view_count = patchwork_archive.views.view_count + 1"""
             , (video_id,))
         return jsonify(dict_data)
     else:
@@ -339,7 +339,7 @@ def api_get_video_data_from_database(video_id):
 def api_get_file_data(video_id):
     server = create_database_connection()
     if server.check_row_exists(table_name="files", column_name="video_id", value=video_id):
-        data = server.get_query_result("SELECT * FROM files WHERE video_id = %s", (video_id, ))
+        data = server.get_query_result("SELECT * FROM patchwork_archive.files WHERE video_id = %s", (video_id, ))
         dict_data = {
             "video_id": data[0][0],
             "file_size": data[0][1],
@@ -385,7 +385,7 @@ def get_next_video_in_queue():
     """
     server = create_database_connection()
     try:
-        data = server.get_query_result("SELECT url, mode FROM archive_queue ORDER BY id LIMIT 1;")[0]
+        data = server.get_query_result("SELECT url, mode FROM patchwork_archive.archive_queue ORDER BY id LIMIT 1;")[0]
         if data is None:
             return None, None
         next_video, mode = data[0], data[1]
@@ -467,10 +467,10 @@ def get_storage_status():
             return jsonify(storage_cache)
     try:
         server = create_database_connection()
-        number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM songs")[0][0])
-        storage_size  = float(server.get_query_result("SELECT SUM(size_mb) FROM files")[0][0])
-        number_of_channels = int(server.get_query_result("SELECT COUNT(DISTINCT channel_id) FROM songs")[0][0])
-        most_recenty_archived_video_date = server.get_query_result("SELECT upload_date FROM songs ORDER BY upload_date DESC LIMIT 1")[0][0]
+        number_of_files = int(server.get_query_result("SELECT COUNT(*) FROM patchwork_archive.songs")[0][0])
+        storage_size  = float(server.get_query_result("SELECT SUM(size_mb) FROM patchwork_archive.files")[0][0])
+        number_of_channels = int(server.get_query_result("SELECT COUNT(DISTINCT channel_id) FROM patchwork_archive.songs")[0][0])
+        most_recenty_archived_video_date = server.get_query_result("SELECT upload_date FROM patchwork_archive.songs ORDER BY upload_date DESC LIMIT 1")[0][0]
         server.close_connection()
         if os.environ.get("USE_REDIS") == "True":
             redis_handler.set_kv_data("storage",
@@ -523,7 +523,7 @@ def api_exact_match():
     if not title or not channel_name:
         server.close_connection()
         return jsonify({"error": "Missing title or channel_name parameter"}), 400
-    query = "SELECT video_id FROM songs WHERE title = %s AND channel_name = %s"
+    query = "SELECT video_id FROM patchwork_archive.songs WHERE title = %s AND channel_name = %s"
     result = server.get_query_result(query, (title, channel_name))
     server.close_connection()
     if not result:

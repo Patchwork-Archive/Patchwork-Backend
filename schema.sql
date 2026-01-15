@@ -1,108 +1,105 @@
-create table archive_log
-(
-    id        int auto_increment
-        primary key,
-    url       text         not null,
-    user      varchar(128) not null,
-    status    text         not null,
-    timestamp text         null
+CREATE SCHEMA IF NOT EXISTS patchwork_archive;
+
+-- =====================
+-- Sequences
+-- =====================
+
+CREATE SEQUENCE patchwork_archive.archive_log_id_seq;
+CREATE SEQUENCE patchwork_archive.archive_queue_id_seq;
+CREATE SEQUENCE patchwork_archive.archive_queue_auth_id_seq;
+CREATE SEQUENCE patchwork_archive.archive_worker_auth_id_seq;
+CREATE SEQUENCE patchwork_archive.romanized_id_seq;
+CREATE SEQUENCE patchwork_archive.songs_id_seq;
+
+-- =====================
+-- Tables
+-- =====================
+
+CREATE TABLE patchwork_archive.archive_log (
+    id integer PRIMARY KEY DEFAULT nextval('patchwork_archive.archive_log_id_seq'),
+    url text NOT NULL,
+    "user" varchar(128) NOT NULL,
+    status text NOT NULL,
+    "timestamp" text
 );
 
-create table archive_queue
-(
-    id   int auto_increment
-        primary key,
-    url  text null,
-    mode int  null
+CREATE TABLE patchwork_archive.archive_queue (
+    id integer PRIMARY KEY DEFAULT nextval('patchwork_archive.archive_queue_id_seq'),
+    url text,
+    mode integer
+);
+CREATE TABLE patchwork_archive.archive_queue_auth (
+    id integer PRIMARY KEY DEFAULT nextval('patchwork_archive.archive_queue_auth_id_seq'),
+    token varchar(128)
 );
 
-create table archive_queue_auth
-(
-    id    int auto_increment
-        primary key,
-    token varchar(128) null
+CREATE TABLE patchwork_archive.archive_worker_auth (
+    id integer PRIMARY KEY DEFAULT nextval('patchwork_archive.archive_worker_auth_id_seq'),
+    token varchar(128) NOT NULL
 );
 
-create table archive_worker_auth
-(
-    id    int auto_increment
-        primary key,
-    token varchar(128) not null
+CREATE TABLE patchwork_archive.channels (
+    channel_id varchar(255) PRIMARY KEY,
+    channel_name text NOT NULL,
+    romanized_name text,
+    description text
 );
 
-create index archive_worker_auth_token
-    on archive_worker_auth (token);
-
-create table channels
-(
-    channel_id     varchar(255) not null
-        primary key,
-    channel_name   text         not null,
-    romanized_name text         null,
-    description    text         null
+CREATE TABLE patchwork_archive.files (
+    video_id varchar(255) PRIMARY KEY,
+    size_mb double precision,
+    extension varchar(32)
 );
 
-create table files
-(
-    video_id  varchar(255) not null
-        primary key,
-    size_mb   float        null,
-    extension varchar(32)  null
+CREATE TABLE patchwork_archive.kv (
+    data varchar(255) PRIMARY KEY,
+    reference varchar(255)
 );
 
-create table kv
-(
-    DATA      varchar(255) not null
-        primary key,
-    REFERENCE varchar(255) null
+CREATE TABLE patchwork_archive.romanized (
+    id integer PRIMARY KEY DEFAULT nextval('patchwork_archive.romanized_id_seq'),
+    video_id varchar(255) NOT NULL,
+    romanized_title text NOT NULL
 );
 
-create table songs
-(
-    video_id     varchar(255) not null,
-    title        text         not null,
-    channel_name text         not null,
-    channel_id   varchar(255) not null,
-    upload_date  text         not null,
-    description  text         not null,
-    id           int auto_increment
-        primary key
+CREATE TABLE patchwork_archive.songs (
+    id integer PRIMARY KEY DEFAULT nextval('patchwork_archive.songs_id_seq'),
+    video_id varchar(255) NOT NULL,
+    title text NOT NULL,
+    channel_name text NOT NULL,
+    channel_id varchar(255) NOT NULL,
+    upload_date text NOT NULL,
+    description text NOT NULL
 );
 
-create table romanized
-(
-    id              int auto_increment
-        primary key,
-    video_id        varchar(255) not null,
-    romanized_title text         not null,
-    constraint video_id_exists
-        foreign key (video_id) references songs (video_id)
-            on delete cascade
+CREATE TABLE patchwork_archive.views (
+    video_id varchar(255) PRIMARY KEY,
+    view_count integer NOT NULL
 );
 
-create index idx_songs_on_channel_id
-    on songs (channel_id);
-
-create index idx_songs_on_video_id
-    on songs (video_id);
-
-create table worker_status
-(
-    id        int          not null
-        primary key,
-    name      text         null,
-    token     varchar(128) null,
-    status    text         null,
-    timestamp text         null,
-    constraint valid_worker
-        foreign key (token) references archive_worker_auth (token)
+CREATE TABLE patchwork_archive.worker_status (
+    id integer PRIMARY KEY,
+    name text,
+    token varchar(128),
+    status text,
+    "timestamp" text
 );
 
-create table if not exists views
-(
-    video_id   varchar(255) not null
-        primary key,
-    view_count int          not null,
-    constraint views_songs_video_id_fk
-        foreign key (video_id) references patchwork_archive.songs (video_id)
-);
+-- =====================
+-- Indexes
+-- =====================
+
+CREATE INDEX idx_archive_worker_auth_token
+    ON patchwork_archive.archive_worker_auth (token);
+
+CREATE INDEX idx_romanized_video_id
+    ON patchwork_archive.romanized (video_id);
+
+CREATE INDEX idx_songs_channel_id
+    ON patchwork_archive.songs (channel_id);
+
+CREATE INDEX idx_songs_video_id
+    ON patchwork_archive.songs (video_id);
+
+CREATE INDEX idx_worker_status_token
+    ON patchwork_archive.worker_status (token);
