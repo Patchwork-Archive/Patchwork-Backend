@@ -18,7 +18,7 @@ class SQLHandler:
                 database=os.environ.get("DB_DATABASE"),
                 user=os.environ.get("DB_USERNAME"),
                 password=os.environ.get("DB_PASSWORD"),
-                port=os.environ.get("DB_PORT", "5432")
+                port=os.environ.get("DB_PORT", "6543")
             )
             connection.autocommit = False
         except Error as err:
